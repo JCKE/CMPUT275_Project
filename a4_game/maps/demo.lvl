@@ -1,0 +1,25 @@
+Teams: 1
+Tiles: assets/tiles.png
+Tile size: 20x20
+Map: maps/demo.gif
+
+UNITS START
+SuperJeep 0 1 1 0
+SuperJeep 0 11 1 270
+Artillery 0 28 1 180
+Artillery 0 28 7 180
+Artillery 0 28 8 180
+Anti-Armour 0 28 13 180
+Anti-Armour 0 28 14 180
+Carrier 0 22 26 90
+Fighter 0 21 26 90
+Bomber 0 23 26 90
+Battleship 1 22 1 270
+Anti-Armour 1 22 7 0
+Anti-Armour 1 22 8 0
+Jeep 1 23 13 0
+Tank 1 23 14 0
+Carrier 1 22 18 90
+Fighter 1 21 18 90
+Bomber 1 23 18 90
+UNITS END

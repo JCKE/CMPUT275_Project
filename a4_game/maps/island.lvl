@@ -1,0 +1,31 @@
+Teams: 2
+Tiles: assets/tiles.png
+Tile size: 20x20
+Map: maps/island.gif
+
+UNITS START
+Anti-Air 0 22 22 180
+Jeep 0 19 20 90
+Jeep 0 20 22 180
+Tank 0 18 22 90
+Tank 0 21 20 180
+Artillery 0 21 19 180
+Anti-Armour 0 18 21 90
+Battleship 0 27 20 90
+Battleship 0 13 27 180
+Bomber 0 27 26 180
+Carrier 0 27 27 0
+Fighter 0 26 27 180
+Anti-Air 1 9 6 0
+Jeep 1 11 9 270
+Jeep 1 9 8 0
+Tank 1 10 7 270
+Tank 1 12 7 270
+Artillery 1 9 10 0
+Anti-Armour 1 10 9 270
+Battleship 1 2 10 270
+Battleship 1 18 1 0
+Carrier 1 2 2 180
+Fighter 1 2 3 0
+Bomber 1 3 2 0
+UNITS END
