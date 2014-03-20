@@ -12,10 +12,10 @@ def destroy_prob(attacker, defender, current_tile, turns):
     prob_list = list()
     memo = {}
 
-    if attacker.phony_damage == True:
-        d = attacker.get_false_damage(defender, current_tile) # get falsified attacker damage
-    else:
-        d = attacker.get_damage(defender, current_tile) # get attacker damage
+  #  if attacker.phony_damage == True:
+   #     d = attacker.get_false_damage(defender, current_tile) # get falsified attacker damage
+   # else:
+    d = attacker.get_damage(defender, current_tile) # get attacker damage
     for turn in range(turns + 1):
         prob_list.append(memo_prob(d, defender.health, turn, memo)) # append probability at that turn to prob
         
