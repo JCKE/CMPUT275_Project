@@ -32,6 +32,10 @@ while 1:
         # Respond to clicks
         elif event.type == pygame.MOUSEBUTTONUP:
             main_gui.on_click(event)
+        # Allows player to use enter/return to end turn
+        elif (event.type == pygame.KEYDOWN and 
+              event.key == pygame.K_RETURN):
+            main_gui.on_click(event)
     main_gui.update()
     main_gui.draw()
     clock.tick(60)

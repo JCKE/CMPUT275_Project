@@ -42,8 +42,8 @@ To cancel your attack, click again on either the **ATTACK** button or
 click either mouse button on your selected unit.
 
 Each turn, you may move each of your units once and attack with each of your 
-units once. When you are done, press the **END TURN** button to let the 
-other team take its turn. In some cases, such as with air units, the unit 
+units once. When you are done, press the **END TURN** button or press enter/return
+to let the other team take its turn. In some cases, such as with air units, the unit 
 must be moved before you can end your turn. In this case, pressing the **END 
 TURN** button will automatically select the unit if it has not yet been moved.
 

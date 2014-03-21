@@ -506,11 +506,11 @@ class GUI(LayeredUpdates):
                         SoundManager.play(SELECT_SOUND)
                         self.buttons[1].onClick()
                         
-                        # Attack
-                        if (self.sel_unit and
-                            to_tile_pos in self._attackable_tiles):
-                            # Attack the selected tile
-                            self.sel_unit_attack(to_tile_pos)
+                    # Attack
+                    elif (self.sel_unit and
+                          to_tile_pos in self._attackable_tiles):
+                        # Attack the selected tile
+                        self.sel_unit_attack(to_tile_pos)
                 else:
                     # No unit there, so a tile was clicked
                     if (self.mode == Modes.ChooseMove and
@@ -532,6 +532,9 @@ class GUI(LayeredUpdates):
                         
                         # Play the button sound
                         SoundManager.play(BUTTON_SOUND)
+        # Pressing enter/return ends the turn
+        elif(e.type == pygame.KEYDOWN and e.key == pygame.K_RETURN):
+            self.buttons[2].onClick()
             
     def sel_unit_attack(self, pos):
         """
