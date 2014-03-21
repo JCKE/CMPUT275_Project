@@ -1,8 +1,12 @@
-tactics
+Tactics 2
 =======
 
-A tactics game battle system along the lines of Advance Wars or Fire Emblem.
-Programmed Elliot Colp and Braedy Kuzma.
+The original tactics game is a tactics game battle system along the lines of 
+Advance Wars or Fire Emblem. Programmed Elliot Colp and Braedy Kuzma.
+
+Tactics 2 extends their original work to add an extra demension to the 
+gameplay to include the Arduino and three other players.
+Tactics 2 is programmed by Jesse Emery and Steven Cherfan.
 
 Installing/Running
 ------------------
