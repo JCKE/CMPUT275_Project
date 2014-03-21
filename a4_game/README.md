@@ -24,18 +24,18 @@ Gameplay
 By default, there are two team: red and green. The goal of the game is 
 destroy all of the other team's units.
 
-Click on a unit to select it. It will be highlighted in yellow.
+Left click on a unit to select it and enter **MOVE** mode, also clicking 
+the **MOVE** button will have you enter this mode. It will be highlighted
+in yellow and all reachable tiles will glow blue. Left click on one of these tiles, 
+and the selected unit will move to it. To cancel movement, 
+left click on either the **MOVE** button or your selected unit.
 
-If you click on the **MOVE** button, all reachable tiles will glow blue. 
-Click on one of these tiles, and the selected unit will move to it. To 
-cancel movement, click again on either the **MOVE** button or your selected 
-unit.
-
-If you click on the **ATTACK** button, all tiles in range will glow red. As 
-well, any units which are available to attack will be marked with a blinking 
-targeting reticle. Click on any such unit and your selected unit will attack 
-it. To cancel your attack, click again on either the **ATTACK** button or 
-your selected unit.
+If you right click on  your unit or left click on the **ATTACK** button, 
+all tiles in range will glow red. As well, any units which are available 
+to attack will be marked with a blinking targeting reticle.
+Left click on any such unit and your selected unit will attack it. 
+To cancel your attack, click again on either the **ATTACK** button or 
+click either mouse button on your selected unit.
 
 Each turn, you may move each of your units once and attack with each of your 
 units once. When you are done, press the **END TURN** button to let the 
