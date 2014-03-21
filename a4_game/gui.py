@@ -443,11 +443,13 @@ class GUI(LayeredUpdates):
                         self.change_mode(Modes.Select)
                         self.sel_unit = None
 
-                    # select a new unit
+                    # select a new unit and go into move mode on click
                     elif (self.mode == Modes.Select and
                           unit.team == self.cur_team):
                         self.sel_unit = unit
                         SoundManager.play(SELECT_SOUND)
+                        self.buttons[0].onClick()
+                        
                         
                     # Attack
                     elif (self.mode == Modes.ChooseAttack and
@@ -476,7 +478,61 @@ class GUI(LayeredUpdates):
                         
                         # Play the button sound
                         SoundManager.play(BUTTON_SOUND)
+
+        # make sure we have focus and that it was the right mouse button
+        elif (e.type == pygame.MOUSEBUTTONUP
+            and e.button == 3
+            and pygame.mouse.get_focused()):
+            
+            # If this is in the map, we're dealing with units or tiles
+            if self.map.rect.collidepoint(e.pos):
+                # Get the tile's position
+                to_tile_pos = self.map.tile_coords(e.pos)
+
+                # get the unit at the mouseclick
+                unit = self.get_unit_at_screen_pos(e.pos)
+                
+                if unit:
+                    # clicking the same unit again deselects it and, if
+                    # necessary, resets select mode
+                    if unit == self.sel_unit:
+                        self.change_mode(Modes.Select)
+                        self.sel_unit = None
+
+                    # select a new unit and goes into attack mode on click of unit
+                    elif (self.mode == Modes.Select and
+                          unit.team == self.cur_team):
+                        self.sel_unit = unit
+                        SoundManager.play(SELECT_SOUND)
+                        self.buttons[1].onClick()
                         
+                        # Attack
+                        if (self.sel_unit and
+                            to_tile_pos in self._attackable_tiles):
+                            # Attack the selected tile
+                            self.sel_unit_attack(to_tile_pos)
+                else:
+                    # No unit there, so a tile was clicked
+                    if (self.mode == Modes.ChooseMove and
+                        self.sel_unit and
+                        to_tile_pos in self._movable_tiles):
+                        
+                        # Move to the selected tile
+                        self.sel_unit_move(to_tile_pos)
+            
+            # Otherwise, the user is interacting with the GUI panel
+            else:
+                # Check which button was pressed
+                for button in self.buttons:
+                    # If the button is enabled and has a click function, call
+                    # the function
+                    if ((not button.condition or button.condition()) and
+                        self.get_button_rect(button).collidepoint(e.pos)):
+                        button.onClick()
+                        
+                        # Play the button sound
+                        SoundManager.play(BUTTON_SOUND)
+            
     def sel_unit_attack(self, pos):
         """
         Attack the given position using the selected unit.
