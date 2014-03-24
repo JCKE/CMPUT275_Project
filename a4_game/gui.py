@@ -142,6 +142,7 @@ class GUI(LayeredUpdates):
         
         # Set the current GUI mode
         self.change_mode(Modes.ChooseMove)
+
             
     def attack_pressed(self):
         """
@@ -463,6 +464,7 @@ class GUI(LayeredUpdates):
                         self.sel_unit and
                         to_tile_pos in self._movable_tiles):
                         
+                    #    self.change_mode(Modes.Select)
                         # Move to the selected tile
                         self.sel_unit_move(to_tile_pos)
             
