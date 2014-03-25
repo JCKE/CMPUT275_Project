@@ -28,9 +28,10 @@ class Base(ImmobileUnit):
         self.speed = 0
         self.max_atk_range = 0
         self.damage = 0
-        self.defense = 4
+        self.defense = 2
         self.hit_effect = effects.Explosion
-
+        self.health = 30
+        
     def can_hit(self, target_unit):
         """
         Determines whether a unit can hit another unit.
