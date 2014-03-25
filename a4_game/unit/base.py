@@ -26,11 +26,12 @@ class Base(ImmobileUnit):
         #set unit specific things.
         self.type = "Base"
         self.speed = 0
+        self.health = 30
         self.max_atk_range = 0
         self.damage = 0
         self.defense = 4
         self.hit_effect = effects.Explosion
-
+        
     def can_hit(self, target_unit):
         """
         Determines whether a unit can hit another unit.
