@@ -26,6 +26,7 @@ class Base(ImmobileUnit):
         #set unit specific things.
         self.type = "Base"
         self.speed = 0
+        self.health = 30
         self.max_atk_range = 0
         self.damage = 0
         self.defense = 2

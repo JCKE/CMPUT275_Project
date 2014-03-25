@@ -59,7 +59,7 @@ TEAM_NAME = {
 # http://stackoverflow.com/questions/702834/whats-the-common-practice-
 # for-enums-in-python
 class Modes:
-    Select, ChooseMove, Moving, ChooseAttack, GameOver = range(5)
+    Begin, Select, ChooseMove, Moving, ChooseAttack, GameOver = range(6)
 
 # A container class which stores button information.
 # Each "slot" is a BUTTON_HEIGHT pixel space counting up from the bottom
@@ -142,7 +142,6 @@ class GUI(LayeredUpdates):
         
         # Set the current GUI mode
         self.change_mode(Modes.ChooseMove)
-
             
     def attack_pressed(self):
         """
@@ -202,7 +201,7 @@ class GUI(LayeredUpdates):
                 return
         
         # reset game mode
-        self.change_mode(Modes.Select)
+        self.change_mode(Modes.Begin)
         
         # unselect unit
         self.sel_unit = None
@@ -262,8 +261,8 @@ class GUI(LayeredUpdates):
             Button(1, "ATTACK", self.attack_pressed, self.can_attack),
             Button(2, "END TURN", self.end_turn_pressed, None)]
         
-        # We start in select mode
-        self.mode = Modes.Select
+        # We start in begin mode
+        self.mode = Modes.Begin
         
         # Tiles we can move to/attack
         self._movable_tiles = set()
@@ -414,6 +413,24 @@ class GUI(LayeredUpdates):
             if line == "":
                 raise Exception ("Expected end of unit definitions")
         
+    def begin_turn(self):
+        """
+        Iterates through every active unit and collects tile type
+        of every unit at the start of each turn. The tile type is used
+        for the purposes of giving a bonus to wookiees in the forest.
+
+        Only looks over units of the active team.
+        """
+        for u in base_unit.BaseUnit.active_units:
+            if u.day == 0: # The workaround to fix the 'base.damage not printing properly'
+                u._update_image()
+            if u.team == self.cur_team:
+                unit_pos = (u.tile_x, u.tile_y)
+                unit_tile = self.map.tile_data(unit_pos)[0]
+                u.begin_round(unit_tile)
+
+        self.change_mode(Modes.Select)
+                
     def on_click(self, e):
         """
         This is called when a click event occurs.
@@ -655,6 +672,9 @@ class GUI(LayeredUpdates):
         # Update units
         base_unit.BaseUnit.active_units.update()
         
+        if self.mode == Modes.Begin:
+            self.begin_turn()
+            
         # The unit is finished moving, so go back to select
         if self.mode == Modes.Moving:
             if (not self.sel_unit) or (not self.sel_unit.is_moving):

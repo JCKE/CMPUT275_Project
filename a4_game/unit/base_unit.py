@@ -3,7 +3,6 @@ from pygame.sprite import Sprite
 
 FRAME_MOVE_SPEED = 3/20
 SIZE = 20
-
 class BaseUnit(Sprite):
     """
     The basic representation of a unit from which all other unit types
@@ -41,6 +40,8 @@ class BaseUnit(Sprite):
         self._active = False
         self._path = []
         self.turn_state = [False, False]
+
+        self.day = 0 # added to easily keep track of the number of days that've gone by.
         
         #Default unit stats
         self.health = 15
@@ -123,7 +124,24 @@ class BaseUnit(Sprite):
         Returns the unit's tile position.
         """
         return (self.tile_x, self.tile_y)
-                
+    
+    def begin_round(self, tile):
+        """
+        A method called at the beginning of every round,
+        where unit specific things can be updated.
+        Right now, it's only purposw is to keep track of
+        the days outside of the gui.py.
+
+        The way begin_round() is called in the gui, it
+        will be called over all of the units on only
+        the active team's side at the beginning of a
+        round, so really it is called on every unit
+        once a day.
+        
+        Meant to be completely over-ridden
+        """
+        self.day += 1
+        
     def _update_image(self):
         """
         Re-renders the unit's image.
@@ -149,6 +167,7 @@ class BaseUnit(Sprite):
 
         # Render the health.
         health_surf = BaseUnit.health_font.render(str(int(self.health)))
+        print((int(self.health), self.type, self.tile_x)) #<><><><><><><><><><><><><><><><><><><><>
         
         # Move the health to the bottom-right of the image.
         image_rect = self.image.get_rect()
