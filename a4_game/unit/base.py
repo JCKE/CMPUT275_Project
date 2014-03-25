@@ -42,8 +42,8 @@ class Base(ImmobileUnit):
         if isinstance(target_unit, unit.air_unit.AirUnit):
             return True
             
-        # Not an air unit, return true
-        return True
+        # Can't hit anything
+        return False
 
 
 unit.unit_types["Base"] = Base
