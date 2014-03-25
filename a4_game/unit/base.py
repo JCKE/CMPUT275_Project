@@ -40,7 +40,7 @@ class Base(ImmobileUnit):
         """
         # If it's an air unit return false
         if isinstance(target_unit, unit.air_unit.AirUnit):
-            return False
+            return True
             
         # Not an air unit, return true
         return True

@@ -81,6 +81,19 @@ class Bomber(AirUnit):
                 return 0
                 
             return damage - defense
+        # Do bonus damage to land units
+        elif isinstance(target, unit.immobile_unit.ImmobileUnit):
+            # Calculate the total damage
+            damage = self.damage + self.bonus_land_damage
+            
+            # Get the unit's current defense
+            defense = target.get_defense(tile = target_tile)
+            
+            # Don't do negative damage
+            if (damage - defense < 0):
+                return 0
+                
+            return damage - defense
 
         # Enemy is an air unit, how did you even manage to get here?
         else: 
