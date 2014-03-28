@@ -167,7 +167,7 @@ class BaseUnit(Sprite):
 
         # Render the health.
         health_surf = BaseUnit.health_font.render(str(int(self.health)))
-        print((int(self.health), self.type, self.tile_x)) #<><><><><><><><><><><><><><><><><><><><>
+      #  print((int(self.health), self.type, self.tile_x)) #<><><><><><><><><><><><><><><><><><><><>
         
         # Move the health to the bottom-right of the image.
         image_rect = self.image.get_rect()
