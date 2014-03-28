@@ -1,9 +1,7 @@
 import sys, pygame, tiles
 from gui import GUI
-from side_gui import SideGui
 RESOLUTION = pygame.Rect(0, 0, 900, 600)
 BG_COLOR = (32, 32, 32)
-SIDE_GUI_RES = pygame.Rect(0, 0, 200, 600)
 # Initialize everything
 pygame.mixer.pre_init(22050, -16, 2, 512) # Small buffer for less sound lag
 pygame.init()
@@ -11,7 +9,6 @@ pygame.display.set_caption("Tactics")
 main_gui = GUI(RESOLUTION, BG_COLOR)
 clock = pygame.time.Clock()
 argv = sys.argv[1:]
-
 # If a filename was given, load that level. Otherwise, load a default.
 level = "island"
 if len(argv) > 0:

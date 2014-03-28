@@ -259,7 +259,18 @@ class GUI(LayeredUpdates):
         self.buttons = [
             Button(0, "MOVE", self.move_pressed, self.can_move),
             Button(1, "ATTACK", self.attack_pressed, self.can_attack),
-            Button(2, "END TURN", self.end_turn_pressed, None)]
+            Button(2, "END TURN", self.end_turn_pressed, None),
+            Button(3, "Button3", None, None),
+            Button(4, "Button4", None, None),
+            Button(5, "Button5", None, None),
+            Button(6, "Button6", None, None),
+            Button(7, "Button7", None, None),
+            Button(8, "Button8", None, None),
+            Button(9, "Button9", None, None),
+            Button(10, "Button10", None, None),
+            Button(11, "Button11", None, None),
+            Button(12, "Button12", None, None),
+            Button(13, "Button13", None, None)]
         
         # We start in begin mode
         self.mode = Modes.Begin
@@ -539,18 +550,6 @@ class GUI(LayeredUpdates):
                         # Move to the selected tile
                         self.sel_unit_move(to_tile_pos)
             
-            # Otherwise, the user is interacting with the GUI panel
-            else:
-                # Check which button was pressed
-                for button in self.buttons:
-                    # If the button is enabled and has a click function, call
-                    # the function
-                    if ((not button.condition or button.condition()) and
-                        self.get_button_rect(button).collidepoint(e.pos)):
-                        button.onClick()
-                        
-                        # Play the button sound
-                        SoundManager.play(BUTTON_SOUND)
         # Pressing enter/return ends the turn
         elif(e.type == pygame.KEYDOWN and e.key == pygame.K_RETURN):
             self.buttons[2].onClick()
@@ -976,7 +975,8 @@ class GUI(LayeredUpdates):
             line_num += 1
 
         for button in self.buttons:
-            self.draw_bar_button(button)
+            if button[0] == 0 or button[0] == 1 or button[0] == 2:
+                self.draw_bar_button(button)
 
     def draw_bar_text(self, text, line_num):
         """
