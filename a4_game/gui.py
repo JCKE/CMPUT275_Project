@@ -19,6 +19,7 @@ MAP_WIDTH = 600
 BAR_WIDTH = 200
 BUTTON_HEIGHT = 50
 CENTER = 100
+UNITS_BARW = 110
 
 # Set the fonts
 pygame.font.init()
@@ -217,6 +218,14 @@ class GUI(LayeredUpdates):
         # advance turn
         self.current_turn += 1
 
+    def unit_button_pressed(self):
+        """
+        Handles pressing one of the unit buttons.
+        Should build selected unit by your team's
+        base.
+        """
+        pass
+
     def __init__(self, screen_rect, bg_color):
         """
         Initialize the display.
@@ -238,9 +247,14 @@ class GUI(LayeredUpdates):
                                      0,
                                      BAR_WIDTH,
                                      screen_rect.h)
+        # The rect containing the units buttons
+        self.units_bar_rect = pygame.Rect(0,
+                                          0,
+                                          UNITS_BARW,
+                                          screen_rect.h)
         
         # The rect containing the map view
-        self.view_rect = pygame.Rect(0,
+        self.view_rect = pygame.Rect(115,
                                       0,
                                       MAP_WIDTH,
                                       screen_rect.h)
@@ -260,17 +274,17 @@ class GUI(LayeredUpdates):
             Button(0, "MOVE", self.move_pressed, self.can_move),
             Button(1, "ATTACK", self.attack_pressed, self.can_attack),
             Button(2, "END TURN", self.end_turn_pressed, None),
-            Button(3, "Button3", None, None),
-            Button(4, "Button4", None, None),
-            Button(5, "Button5", None, None),
-            Button(6, "Button6", None, None),
-            Button(7, "Button7", None, None),
-            Button(8, "Button8", None, None),
-            Button(9, "Button9", None, None),
-            Button(10, "Button10", None, None),
-            Button(11, "Button11", None, None),
-            Button(12, "Button12", None, None),
-            Button(13, "Button13", None, None)]
+            Button(3, "B3", self.unit_button_pressed, None),
+            Button(4, "B4", self.unit_button_pressed, None),
+            Button(5, "B5", self.unit_button_pressed, None),
+            Button(6, "B6", self.unit_button_pressed, None),
+            Button(7, "B7", self.unit_button_pressed, None),
+            Button(8, "B8", self.unit_button_pressed, None),
+            Button(9, "B9", self.unit_button_pressed, None),
+            Button(10, "B10", self.unit_button_pressed, None),
+            Button(11, "B11", self.unit_button_pressed, None),
+            Button(12, "B12", self.unit_button_pressed, None),
+            Button(13, "B13", self.unit_button_pressed, None)]
         
         # We start in begin mode
         self.mode = Modes.Begin
@@ -393,6 +407,8 @@ class GUI(LayeredUpdates):
         # Center the map on-screen
         self.map.rect.center = self.view_rect.center
         
+        # Move map to the right 150
+
         # Move up to the unit definitions
         while line.find("UNITS START") < 0:
             line = map_file.readline()
@@ -500,14 +516,15 @@ class GUI(LayeredUpdates):
             else:
                 # Check which button was pressed
                 for button in self.buttons:
-                    # If the button is enabled and has a click function, call
-                    # the function
-                    if ((not button.condition or button.condition()) and
-                        self.get_button_rect(button).collidepoint(e.pos)):
-                        button.onClick()
+                    # If the button is a mode changing button
+                    # and is enabled and has a click function, call the function
+                    if (button[0] == 0 or button[0] == 1 or button[0] == 2):
+                        if ((not button.condition or button.condition()) and
+                            self.get_button_rect(button).collidepoint(e.pos)):
+                            button.onClick()
                         
                         # Play the button sound
-                        SoundManager.play(BUTTON_SOUND)
+                            SoundManager.play(BUTTON_SOUND)
 
         # make sure we have focus and that it was the right mouse button
         elif (e.type == pygame.MOUSEBUTTONUP
@@ -717,6 +734,9 @@ class GUI(LayeredUpdates):
         
         # Draw the status bar
         self.draw_bar()
+
+        # Draw units bar
+        self.draw_units_bar()
         
         # Draw the win message
         if self.mode == Modes.GameOver:
@@ -974,9 +994,9 @@ class GUI(LayeredUpdates):
             self.draw_bar_div_line(line_num)
             line_num += 1
 
-        for button in self.buttons:
-            if button[0] == 0 or button[0] == 1 or button[0] == 2:
-                self.draw_bar_button(button)
+        # Only draw change mode buttons
+        for button in range(3):
+            self.draw_bar_button(self.buttons[button])
 
     def draw_bar_text(self, text, line_num):
         """
@@ -1022,6 +1042,73 @@ class GUI(LayeredUpdates):
     def draw_bar_button(self, button):
         """
         Renders a button to the bar.
+        If the mouse is hovering over the button it is rendered in white,
+        else rgb(50, 50, 50).
+        """
+
+        but_rect = self.get_button_rect(button)
+        
+        # The outline needs a slightly smaller rectangle
+        but_out_rect = but_rect
+        but_out_rect.width -= 1
+
+        # Determine the button color
+        but_color = BAR_COLOR
+        
+        # The button can't be used
+        if button.condition and not button.condition():
+            but_color = BUTTON_DISABLED_COLOR
+        else:
+            # The button can be used
+            mouse_pos = pygame.mouse.get_pos()
+            if but_rect.collidepoint(mouse_pos):
+                # Highlight on mouse over
+                but_color = BUTTON_HIGHLIGHT_COLOR
+        
+        # Draw the button
+        pygame.draw.rect(self.screen, but_color, but_rect)
+            
+        # Draw the outline
+        pygame.draw.rect(self.screen, OUTLINE_COLOR, but_out_rect, 2)
+
+        # Draw the text
+        but_text = FONT.render(button.text, True, FONT_COLOR)
+        self.screen.blit(
+            but_text,
+            (self.bar_rect.centerx - (but_text.get_width()/2),
+            but_rect.y + (BUTTON_HEIGHT//2) - but_text.get_height()//2))
+
+
+    def draw_units_bar(self):
+        """
+        Draws the units buttons bar on the left side of the screen.
+        """
+        if not self.map: return
+        
+#        line_num = 0
+        
+        #Determine where the mouse is
+        mouse_pos = pygame.mouse.get_pos()
+        coords = self.map.tile_coords(mouse_pos)
+        
+        #draw the background of the bar
+        barRect = self.units_bar_rect
+        pygame.draw.rect(self.screen, BAR_COLOR, barRect)
+        
+        #draw the outline of the bar
+        outlineRect = self.bar_rect.copy()
+        outlineRect.w -= 1
+        outlineRect.h -= 1
+        pygame.draw.rect(self.screen, OUTLINE_COLOR, outlineRect, 2)
+        
+         # Only draw units buttons
+        for button in range(4, 14):
+            self.draw_bar_button(self.buttons[button])
+
+
+    def draw_units_button(self, button):
+        """
+        Renders a button to the units bar.
         If the mouse is hovering over the button it is rendered in white,
         else rgb(50, 50, 50).
         """

@@ -1,6 +1,6 @@
 import sys, pygame, tiles
 from gui import GUI
-RESOLUTION = pygame.Rect(0, 0, 900, 600)
+RESOLUTION = pygame.Rect(0, 0, 915, 600)
 BG_COLOR = (32, 32, 32)
 # Initialize everything
 pygame.mixer.pre_init(22050, -16, 2, 512) # Small buffer for less sound lag
