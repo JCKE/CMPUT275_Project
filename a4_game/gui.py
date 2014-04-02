@@ -1103,7 +1103,7 @@ class GUI(LayeredUpdates):
         
          # Only draw units buttons
         for button in range(4, 14):
-            self.draw_bar_button(self.buttons[button])
+            self.draw_units_button(self.buttons[button])
 
 
     def draw_units_button(self, button):
@@ -1113,7 +1113,7 @@ class GUI(LayeredUpdates):
         else rgb(50, 50, 50).
         """
 
-        but_rect = self.get_button_rect(button)
+        but_rect = self.get_unit_button_rect(button)
         
         # The outline needs a slightly smaller rectangle
         but_out_rect = but_rect
@@ -1142,5 +1142,18 @@ class GUI(LayeredUpdates):
         but_text = FONT.render(button.text, True, FONT_COLOR)
         self.screen.blit(
             but_text,
-            (self.bar_rect.centerx - (but_text.get_width()/2),
+            (self.units_bar_rect.centerx - (but_text.get_width()/2),
             but_rect.y + (BUTTON_HEIGHT//2) - but_text.get_height()//2))
+
+
+    def get_unit_button_rect(self, button):
+        """
+        Gets the rectangle bounding a button in screen cordinates.
+        """
+        # The y-coordinate is based on its slot number
+        y = self.screen.get_height() - BUTTON_HEIGHT * (button.slot + 1)
+        return pygame.Rect(self.units_bar_rect.x,
+                            y,
+                            self.units_bar_rect.width,
+                            BUTTON_HEIGHT)
+
