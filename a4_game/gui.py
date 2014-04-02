@@ -18,11 +18,12 @@ BUTTON_SOUND = "Button"
 MAP_WIDTH = 600
 BAR_WIDTH = 200
 BUTTON_HEIGHT = 50
+UNIT_BUTTON_HEIGHT = 40
 CENTER = 100
-UNITS_BARW = 110
+UNITS_BARW = 115
 
 # Set the fonts
-pygame.font.init()
+pygame.font.init() 
 FONT_SIZE = 16
 BIG_FONT_SIZE = 42
 FONT = pygame.font.SysFont("Arial", FONT_SIZE)
@@ -98,7 +99,18 @@ class GUI(LayeredUpdates):
         
         # If the unit is done its attack, we also can't.
         return not self.sel_unit.turn_state[1]
-    
+   
+    def can_build(self):
+        """
+        Checks whether the base, airstrip or shipyard is selected. 
+        """
+        # If the base, airstrip or shipyard unit is selected.
+        # Otherwise we can use the buttons.
+        if self.sel_unit:
+            type = self.sel_unit.type
+            if type != "Base": return False
+        return self.sel_unit
+        
     def move_pressed(self):
         """
         This is called when the move button is pressed.
@@ -274,17 +286,17 @@ class GUI(LayeredUpdates):
             Button(0, "MOVE", self.move_pressed, self.can_move),
             Button(1, "ATTACK", self.attack_pressed, self.can_attack),
             Button(2, "END TURN", self.end_turn_pressed, None),
-            Button(3, "B3", self.unit_button_pressed, None),
-            Button(4, "B4", self.unit_button_pressed, None),
-            Button(5, "B5", self.unit_button_pressed, None),
-            Button(6, "B6", self.unit_button_pressed, None),
-            Button(7, "B7", self.unit_button_pressed, None),
-            Button(8, "B8", self.unit_button_pressed, None),
-            Button(9, "B9", self.unit_button_pressed, None),
-            Button(10, "B10", self.unit_button_pressed, None),
-            Button(11, "B11", self.unit_button_pressed, None),
-            Button(12, "B12", self.unit_button_pressed, None),
-            Button(13, "B13", self.unit_button_pressed, None)]
+            Button(0, "B3", self.unit_button_pressed, self.can_build),
+            Button(1, "B4", self.unit_button_pressed, self.can_build),
+            Button(2, "B5", self.unit_button_pressed, self.can_build),
+            Button(3, "B6", self.unit_button_pressed, self.can_build),
+            Button(4, "B7", self.unit_button_pressed, self.can_build),
+            Button(5, "B8", self.unit_button_pressed, self.can_build),
+            Button(6, "B9", self.unit_button_pressed, self.can_build),
+            Button(7, "B10", self.unit_button_pressed, self.can_build),
+            Button(8, "B11", self.unit_button_pressed, self.can_build),
+            Button(9, "B12", self.unit_button_pressed, self.can_build),
+            Button(10, "B13", self.unit_button_pressed, self.can_build)]
         
         # We start in begin mode
         self.mode = Modes.Begin
@@ -1085,7 +1097,7 @@ class GUI(LayeredUpdates):
         """
         if not self.map: return
         
-#        line_num = 0
+        line_num = 0
         
         #Determine where the mouse is
         mouse_pos = pygame.mouse.get_pos()
@@ -1102,7 +1114,7 @@ class GUI(LayeredUpdates):
         pygame.draw.rect(self.screen, OUTLINE_COLOR, outlineRect, 2)
         
          # Only draw units buttons
-        for button in range(4, 14):
+        for button in range(3, len(self.buttons)):
             self.draw_units_button(self.buttons[button])
 
 
@@ -1143,7 +1155,7 @@ class GUI(LayeredUpdates):
         self.screen.blit(
             but_text,
             (self.units_bar_rect.centerx - (but_text.get_width()/2),
-            but_rect.y + (BUTTON_HEIGHT//2) - but_text.get_height()//2))
+            but_rect.y + (UNIT_BUTTON_HEIGHT//2) - but_text.get_height()//2))
 
 
     def get_unit_button_rect(self, button):
@@ -1151,9 +1163,9 @@ class GUI(LayeredUpdates):
         Gets the rectangle bounding a button in screen cordinates.
         """
         # The y-coordinate is based on its slot number
-        y = self.screen.get_height() - BUTTON_HEIGHT * (button.slot + 1)
+        y = self.screen.get_height() - UNIT_BUTTON_HEIGHT * (button.slot + 1)
         return pygame.Rect(self.units_bar_rect.x,
                             y,
                             self.units_bar_rect.width,
-                            BUTTON_HEIGHT)
+                            UNIT_BUTTON_HEIGHT)
 
