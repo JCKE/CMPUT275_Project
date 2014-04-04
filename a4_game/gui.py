@@ -359,9 +359,9 @@ class GUI(LayeredUpdates):
             Button(4, "Bomber", self.unit_button_pressed, self.can_build_air_units),
             Button(5, "Fighter", self.unit_button_pressed, self.can_build_air_units),
             Button(6, "Carrier", self.unit_button_pressed, self.can_build_water_units),
-            Button(7, "Battleship", self.unit_button_pressed, self.can_build_water_units),
-            Button(8, "Shipyard", None, None),
-            Button(9, "Airstrip", None, None)]
+            Button(7, "Battleship", self.unit_button_pressed, self.can_build_water_units)]
+         #   Button(8, "Shipyard", None, None),
+         #   Button(9, "Airstrip", None, None)]
          #   Button(10, "B13", None, None)]
 
         # We start in begin mode
