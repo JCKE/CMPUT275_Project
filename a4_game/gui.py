@@ -126,6 +126,19 @@ class GUI(LayeredUpdates):
             if type != "Airstrip": return False
         return self.sel_unit
 
+    def can_build_water_units(self):
+        """
+        Checks whether the shipyard is selected. 
+        """
+        # If the base unit is selected then we can
+        # use ground units.
+        # Otherwise we can't use the buttons.
+        if self.sel_unit:
+            type = self.sel_unit.type
+            if type != "Shipyard": return False
+        return self.sel_unit
+
+
         
     def move_pressed(self):
         """
@@ -258,9 +271,13 @@ class GUI(LayeredUpdates):
         elif self.cur_team == 1 and type == "Base":
             unit_x, unit_y = self.rteam_base[0], self.rteam_base[1] + 1
         elif self.cur_team == 0 and type == "Airstrip":
-            unit_x, unit_y = self.gteam_airstrip[0], self.gteam_airstrip[1]
+            unit_x, unit_y = self.gteam_airstrip[0], self.gteam_airstrip[1] - 1
         elif self.cur_team == 1 and type == "Airstrip":
-            unit_x, unit_y = self.rteam_airstrip[0], self.rteam_airstrip[1]
+            unit_x, unit_y = self.rteam_airstrip[0], self.rteam_airstrip[1] + 1
+        elif self.cur_team == 0 and type == "Shipyard":
+            unit_x, unit_y = self.gteam_shipyard[0], self.gteam_shipyard[1] + 1
+        elif self.cur_team == 1 and type == "Shipyard":
+            unit_x, unit_y = self.rteam_shipyard[0], self.rteam_shipyard[1] - 1
         else:
             raise Exception("Either team or unit is wrong team {} unit {}".format(self.cur_team, type))
 
@@ -327,6 +344,8 @@ class GUI(LayeredUpdates):
         self.gteam_base = None
         self.gteam_airstrip = None
         self.rteam_airstrip = None
+        self.gteam_shipyard = None
+        self.rteam_shipyard = None
 
         # Set up GUI
         self.buttons = [
@@ -339,8 +358,8 @@ class GUI(LayeredUpdates):
             Button(3, "Artillery", self.unit_button_pressed, self.can_build_ground_units),
             Button(4, "Bomber", self.unit_button_pressed, self.can_build_air_units),
             Button(5, "Fighter", self.unit_button_pressed, self.can_build_air_units),
-            Button(6, "B9", self.unit_button_pressed, None),
-            Button(7, "B10", self.unit_button_pressed, None),
+            Button(6, "Carrier", self.unit_button_pressed, self.can_build_water_units),
+            Button(7, "Battleship", self.unit_button_pressed, self.can_build_water_units),
             Button(8, "B11", self.unit_button_pressed, None),
             Button(9, "B12", self.unit_button_pressed, None),
             Button(10, "B13", self.unit_button_pressed, None)]
@@ -494,7 +513,11 @@ class GUI(LayeredUpdates):
                 self.gteam_airstrip = (unit_x, unit_y)
             elif unit_name == "Airstrip" and unit_team == 1:
                 self.rteam_airstrip = (unit_x, unit_y)
-            
+            elif unit_name == "Shipyard" and unit_team == 0:
+                self.gteam_shipyard = (unit_x, unit_y)
+            elif unit_name == "Shipyard" and unit_team == 1:
+                self.rteam_shipyard = (unit_x, unit_y)
+                
             if not unit_name in unit.unit_types:
                 raise Exception("No unit of name {} found!".format(unit_name))
             new_unit = unit.unit_types[unit_name](team = unit_team,
@@ -546,6 +569,10 @@ class GUI(LayeredUpdates):
             self.current_button = "Fighter"
         elif button[1] == "Bomber":
             self.current_button = "Bomber"
+        elif button[1] == "Carrier":
+            self.current_button = "Carrier"
+        elif button[1] == "Battleship":
+            self.current_button = "Battleship"
         
                 
     def on_click(self, e):
