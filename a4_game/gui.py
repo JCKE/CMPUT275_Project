@@ -10,6 +10,7 @@ from effects.explosion import Explosion
 from sounds import SoundManager
 import analyze
 
+
 # Sound names
 SELECT_SOUND = "Select"
 BUTTON_SOUND = "Button"
@@ -21,6 +22,7 @@ BUTTON_HEIGHT = 50
 UNIT_BUTTON_HEIGHT = 40
 CENTER = 100
 UNITS_BARW = 115
+NUM_UNIT_BUTTONS = 11
 
 # Set the fonts
 pygame.font.init() 
@@ -233,10 +235,26 @@ class GUI(LayeredUpdates):
     def unit_button_pressed(self):
         """
         Handles pressing one of the unit buttons.
-        Should build selected unit by your team's
-        base.
+        Builds selected unit by your team's base.
         """
-        pass
+        # Make sure you are building at the right base and one tile away
+        if self.cur_team == 0:
+            unit_x, unit_y = self.gteam_base[0], self.gteam_base[1] + 1
+        elif self.cur_team == 1:
+            unit_x, unit_y = self.rteam_base[0], self.rteam_base[1] + 1
+        unit_team = self.cur_team
+        unit_angle = 0
+        unit_name = self.current_button
+        # Make sure unit is in list and then assign it's info to new_unit
+        if not unit_name in unit.unit_types:
+            raise Exception("No unit of name {} found!".format(unit_name))
+        new_unit = unit.unit_types[unit_name](team = unit_team,
+                                              tile_x = unit_x,
+                                              tile_y = unit_y,
+                                              activate = True,
+                                              angle = unit_angle)
+        # Add the unit to the update group and set its display rect
+        self.update_unit_rect(new_unit)
 
     def __init__(self, screen_rect, bg_color):
         """
@@ -245,7 +263,7 @@ class GUI(LayeredUpdates):
         bg_color: the background color
         """
         LayeredUpdates.__init__(self)
-        
+
         if GUI.num_instances != 0:
             raise Exception("GUI: can only have one instance of a simulation")
         GUI.num_instances = 1
@@ -274,22 +292,26 @@ class GUI(LayeredUpdates):
         self.map = None
 
         # Set up team information
-        self.num_teams = None
+        self.num_teams = 2
         self.current_turn = 0
         self.win_team = None 
-
+        
         # The currently selected unit
         self.sel_unit = None
+        
+        self.current_button = None
+        self.rteam_base = None
+        self.gteam_base = None
         
         # Set up GUI
         self.buttons = [
             Button(0, "MOVE", self.move_pressed, self.can_move),
             Button(1, "ATTACK", self.attack_pressed, self.can_attack),
             Button(2, "END TURN", self.end_turn_pressed, None),
-            Button(0, "B3", self.unit_button_pressed, self.can_build),
-            Button(1, "B4", self.unit_button_pressed, self.can_build),
-            Button(2, "B5", self.unit_button_pressed, self.can_build),
-            Button(3, "B6", self.unit_button_pressed, self.can_build),
+            Button(0, "Tank", self.unit_button_pressed, self.can_build),
+            Button(1, "Jeep", self.unit_button_pressed, self.can_build),
+            Button(2, "Anti-Armour", self.unit_button_pressed, self.can_build),
+            Button(3, "Artillery", self.unit_button_pressed, self.can_build),
             Button(4, "B7", self.unit_button_pressed, self.can_build),
             Button(5, "B8", self.unit_button_pressed, self.can_build),
             Button(6, "B9", self.unit_button_pressed, self.can_build),
@@ -297,7 +319,7 @@ class GUI(LayeredUpdates):
             Button(8, "B11", self.unit_button_pressed, self.can_build),
             Button(9, "B12", self.unit_button_pressed, self.can_build),
             Button(10, "B13", self.unit_button_pressed, self.can_build)]
-        
+
         # We start in begin mode
         self.mode = Modes.Begin
         
@@ -313,7 +335,8 @@ class GUI(LayeredUpdates):
         
         # This will store effects which are drawn over everything else
         self._effects = pygame.sprite.Group()
-    
+
+
     @property
     def cur_team(self):
         """
@@ -436,6 +459,11 @@ class GUI(LayeredUpdates):
             unit_team = int(line[1])
             unit_x, unit_y = int(line[2]), int(line[3])
             unit_angle = int(line[4])
+            # Specify the team and that it is a base unit
+            if unit_name == "Base" and unit_team == 0:
+                self.gteam_base = (unit_x, unit_y)
+            elif unit_name == "Base" and unit_team == 1:
+                self.rteam_base = (unit_x, unit_y)
             
             if not unit_name in unit.unit_types:
                 raise Exception("No unit of name {} found!".format(unit_name))
@@ -469,6 +497,21 @@ class GUI(LayeredUpdates):
                 u.begin_round(unit_tile)
 
         self.change_mode(Modes.Select)
+
+    def which_button(self, button):
+        """
+        Figures out which button is being pressed.
+        Used in building the correct unit at the 
+        correct base.
+        """
+        if button[1] == "Artillery":
+            self.current_button = "Artillery"
+        elif button[1] == "Tank":
+            self.current_button = "Tank"
+        elif button[1] == "Jeep":
+            self.current_button = "Tank"
+        elif button[1] == "Anti-Armour":
+            self.current_button = "Anti-Armour"
                 
     def on_click(self, e):
         """
@@ -523,20 +566,39 @@ class GUI(LayeredUpdates):
                     #    self.change_mode(Modes.Select)
                         # Move to the selected tile
                         self.sel_unit_move(to_tile_pos)
-            
+
             # Otherwise, the user is interacting with the GUI panel
+            # Make sure you aren't clicking outside button area
+            # Handles the unit building buttons
+            elif e.pos[0] < UNITS_BARW and e.pos[1] > 160 and e.pos[1] <= 600:
+                count = 0
+                for button in self.buttons:
+                    if count > 2:
+                    # If the button is a mode changing button
+                    # and is enabled and has a click function, call the function
+                        if ((not button.condition or button.condition()) and
+                            self.get_unit_button_rect(button).collidepoint(e.pos)):
+                            # Determine which button was pressed
+                            self.which_button(button)
+                            button.onClick()
+                            # Play sound button
+                            SoundManager.play(BUTTON_SOUND)
+                    count += 1
+            # Handles turn buttons
             else:
                 # Check which button was pressed
                 for button in self.buttons:
                     # If the button is a mode changing button
                     # and is enabled and has a click function, call the function
-                    if (button[0] == 0 or button[0] == 1 or button[0] == 2):
+                    if (button[1] == "MOVE" or button[1] == "ATTACK" or button[1] == "END TURN"):
                         if ((not button.condition or button.condition()) and
                             self.get_button_rect(button).collidepoint(e.pos)):
                             button.onClick()
-                        
-                        # Play the button sound
+                            # Play the button sound
                             SoundManager.play(BUTTON_SOUND)
+
+
+
 
         # make sure we have focus and that it was the right mouse button
         elif (e.type == pygame.MOUSEBUTTONUP
@@ -624,7 +686,7 @@ class GUI(LayeredUpdates):
         if not atk_unit.active:
             # Add its death effect
             if atk_unit.die_effect:
-                self._effects.add(atk_unit.die_effect(
+               self._effects.add(atk_unit.die_effect(
                     self.map.screen_coords(pos)))
             
             # Play its death sound
@@ -1097,7 +1159,6 @@ class GUI(LayeredUpdates):
         """
         if not self.map: return
         
-        line_num = 0
         
         #Determine where the mouse is
         mouse_pos = pygame.mouse.get_pos()
@@ -1108,7 +1169,7 @@ class GUI(LayeredUpdates):
         pygame.draw.rect(self.screen, BAR_COLOR, barRect)
         
         #draw the outline of the bar
-        outlineRect = self.bar_rect.copy()
+        outlineRect = self.units_bar_rect.copy()
         outlineRect.w -= 1
         outlineRect.h -= 1
         pygame.draw.rect(self.screen, OUTLINE_COLOR, outlineRect, 2)
@@ -1126,7 +1187,7 @@ class GUI(LayeredUpdates):
         """
 
         but_rect = self.get_unit_button_rect(button)
-        
+
         # The outline needs a slightly smaller rectangle
         but_out_rect = but_rect
         but_out_rect.width -= 1
@@ -1168,4 +1229,3 @@ class GUI(LayeredUpdates):
                             y,
                             self.units_bar_rect.width,
                             UNIT_BUTTON_HEIGHT)
-
