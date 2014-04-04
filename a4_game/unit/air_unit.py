@@ -1,5 +1,6 @@
 from unit.base_unit import BaseUnit
 from unit.carrier import Carrier
+from unit.airstrip import Airstrip
 import unit, helper
 from tiles import Tile
 import pygame
@@ -94,7 +95,7 @@ class AirUnit(BaseUnit):
         """
         for u in BaseUnit.active_units:
             if (u.team == self.team and
-                isinstance(u, Carrier) and
+                (isinstance(u, Carrier) or isinstance(u, Airstrip)) and
                 helper.manhattan_dist((u.tile_x, u.tile_y), pos) <= 1):
                 # This is an adjacent carrier! Rejoice!
                 return True
