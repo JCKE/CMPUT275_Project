@@ -13,6 +13,7 @@ Changes on the PyGame side include:
 - Adding a 'create units' screen at the beginning of the turn
 - Making a 'home base' where the units created will spawn
 - Communication to the Arduino client and a resource exchange system between turns
+- Create two other home base types: one builds water units and the other air units while the home base will build land units
 
 To accomplish our project, we would need to borrow a larger LCD screen like one of the touch screens for the Arduino players to play on. We may end up using touch functionality too depending on how far we get.
 
