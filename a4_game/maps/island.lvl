@@ -9,6 +9,7 @@ Jeep 0 19 20 90
 Jeep 0 20 22 180
 Tank 0 18 22 90
 Base 0 21 20 0
+Airstrip 0 17 19 0
 Artillery 0 21 19 180
 Anti-Armour 0 18 21 90
 Battleship 0 27 20 90
@@ -20,6 +21,7 @@ Anti-Air 1 9 6 0
 Jeep 1 11 9 270
 Jeep 1 9 8 0
 Base 1 10 7 0
+Airstrip 1 11 5 0
 Tank 1 12 7 270
 Artillery 1 9 10 0
 Anti-Armour 1 10 9 270
