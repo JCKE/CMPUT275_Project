@@ -137,8 +137,6 @@ class GUI(LayeredUpdates):
             type = self.sel_unit.type
             if type != "Shipyard": return False
         return self.sel_unit
-
-
         
     def move_pressed(self):
         """
@@ -271,7 +269,7 @@ class GUI(LayeredUpdates):
         elif self.cur_team == 1 and type == "Base":
             unit_x, unit_y = self.rteam_base[0], self.rteam_base[1] + 1
         elif self.cur_team == 0 and type == "Airstrip":
-            unit_x, unit_y = self.gteam_airstrip[0], self.gteam_airstrip[1] - 1
+            unit_x, unit_y = self.gteam_airstrip[0], self.gteam_airstrip[1] + 1
         elif self.cur_team == 1 and type == "Airstrip":
             unit_x, unit_y = self.rteam_airstrip[0], self.rteam_airstrip[1] + 1
         elif self.cur_team == 0 and type == "Shipyard":
@@ -293,6 +291,21 @@ class GUI(LayeredUpdates):
                                               tile_y = unit_y,
                                               activate = True,
                                               angle = unit_angle)
+
+        if self.cur_team == 0 and self.current_button == "Base":
+            self.gteam_base = (unit_x, unit_y)
+        elif self.cur_team == 1 and self.current_button == "Base":
+            self.rteam_base = (unit_x, unit_y)
+        elif self.cur_team == 0 and self.current_button == "Airstrip":
+            self.gteam_airstrip = (unit_x, unit_y)
+        elif self.cur_team == 1 and self.current_button == "Airstrip":
+            self.rteam_airstrip = (unit_x, unit_y)
+        elif self.cur_team == 0 and self.current_button == "Shipyard":
+            self.gteam_shipyard = (unit_x, unit_y)
+        elif self.cur_team == 1 and self.current_button == "Shipyard":
+            self.rteam_shipyard = (unit_x, unit_y)
+
+
         # Add the unit to the update group and set its display rect
         self.update_unit_rect(new_unit)
 
@@ -338,7 +351,7 @@ class GUI(LayeredUpdates):
         
         # The currently selected unit
         self.sel_unit = None
-        
+        self.check_base = 0
         self.current_button = None
         self.rteam_base = None
         self.gteam_base = None
@@ -359,10 +372,10 @@ class GUI(LayeredUpdates):
             Button(4, "Bomber", self.unit_button_pressed, self.can_build_air_units),
             Button(5, "Fighter", self.unit_button_pressed, self.can_build_air_units),
             Button(6, "Carrier", self.unit_button_pressed, self.can_build_water_units),
-            Button(7, "Battleship", self.unit_button_pressed, self.can_build_water_units)]
-         #   Button(8, "Shipyard", None, None),
-         #   Button(9, "Airstrip", None, None)]
-         #   Button(10, "B13", None, None)]
+            Button(7, "Battleship", self.unit_button_pressed, self.can_build_water_units),
+            Button(8, "Shipyard", self.build_aux_base, self.can_build_ground_units),
+            Button(9, "Airstrip", self.build_aux_base, self.can_build_ground_units)]
+
 
         # We start in begin mode
         self.mode = Modes.Begin
@@ -504,19 +517,6 @@ class GUI(LayeredUpdates):
             unit_x, unit_y = int(line[2]), int(line[3])
             unit_angle = int(line[4])
 
-            # Specify the team and that it is a base unit
-            if unit_name == "Base" and unit_team == 0:
-                self.gteam_base = (unit_x, unit_y)
-            elif unit_name == "Base" and unit_team == 1:
-                self.rteam_base = (unit_x, unit_y)
-            elif unit_name == "Airstrip" and unit_team == 0:
-                self.gteam_airstrip = (unit_x, unit_y)
-            elif unit_name == "Airstrip" and unit_team == 1:
-                self.rteam_airstrip = (unit_x, unit_y)
-            elif unit_name == "Shipyard" and unit_team == 0:
-                self.gteam_shipyard = (unit_x, unit_y)
-            elif unit_name == "Shipyard" and unit_team == 1:
-                self.rteam_shipyard = (unit_x, unit_y)
                 
             if not unit_name in unit.unit_types:
                 raise Exception("No unit of name {} found!".format(unit_name))
@@ -573,6 +573,10 @@ class GUI(LayeredUpdates):
             self.current_button = "Carrier"
         elif button[1] == "Battleship":
             self.current_button = "Battleship"
+        elif button[1] == "Airstrip":
+            self.current_button = "Airstrip"
+        elif button[1] == "Shipyard":
+            self.current_button = "Shipyard"
         
                 
     def on_click(self, e):
@@ -580,6 +584,7 @@ class GUI(LayeredUpdates):
         This is called when a click event occurs.
         e is the click event.
         """
+
         # Don't react when in move, attack or game over mode.
         if (self.mode == Modes.Moving or
             self.mode == Modes.GameOver):
@@ -597,6 +602,11 @@ class GUI(LayeredUpdates):
 
                 # get the unit at the mouseclick
                 unit = self.get_unit_at_screen_pos(e.pos)
+
+                if unit != None:
+                    type = unit.type
+                    if unit.type == "StartFlag":
+                       self.check_base = 1                    
                 
                 if unit:
                     # clicking the same unit again deselects it and, if
@@ -621,7 +631,16 @@ class GUI(LayeredUpdates):
                         self.sel_unit_attack(to_tile_pos)
                 else:
                     # No unit there, so a tile was clicked
+
                     if (self.mode == Modes.ChooseMove and
+                        self.check_base == 1 and 
+                        to_tile_pos in self._movable_tiles):
+                        self.check_base = 0
+                        self.sel_unit.deactivate()
+                        self.build_base(to_tile_pos)
+                        self.sel_unit = self.get_unit_at_screen_pos(e.pos)
+                        
+                    elif (self.mode == Modes.ChooseMove and
                         self.sel_unit and
                         to_tile_pos in self._movable_tiles):
                         
@@ -796,6 +815,35 @@ class GUI(LayeredUpdates):
                 pos,
                 cost,
                 passable))
+
+    def build_base(self, pos):
+        # Create the units
+
+        unit_name = "Base"
+        unit_team = self.cur_team
+        unit_x, unit_y = pos[0], pos[1]
+        unit_angle = 0
+
+        if unit_team == 0:
+            self.gteam_base = (unit_x, unit_y)
+        elif unit_team == 1:
+            self.rteam_base = (unit_x, unit_y)
+
+
+        if not unit_name in unit.unit_types:
+            raise Exception("No unit of name {} found!".format(unit_name))
+        new_unit = unit.unit_types[unit_name](team = unit_team,
+                                              tile_x = unit_x,
+                                              tile_y = unit_y,
+                                              activate = True,
+                                              angle = unit_angle)
+            
+        # Add the unit to the update group and set its display rect
+        self.update_unit_rect(new_unit)
+
+
+        self.change_mode(Modes.Select)
+
                 
     def get_unit_at_screen_pos(self, pos):
         """

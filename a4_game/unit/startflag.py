@@ -3,7 +3,7 @@ import unit, helper, effects
 from tiles import Tile
 import pygame
 
-class Tank(GroundUnit):
+class StartFlag(GroundUnit):
     """
     A tank. Heavily armed, heavily armoured, and equipped with powerful
     treads.
@@ -19,27 +19,26 @@ class Tank(GroundUnit):
       that it can pass.
     - Can't hit air units.
     """
-    sprite = pygame.image.load("assets/tank.png")
+    sprite = pygame.image.load("assets/startflag.png")
     
     def __init__(self, **keywords):
         #load the image for the base class.
-        self._base_image = Tank.sprite
+        self._base_image = StartFlag.sprite
 
         #load the base class
         super().__init__(**keywords)
 
         #sounds
-        self.move_sound = "TankMove"
-        self.hit_sound = "TankFire"
 
         #set unit specific things.
-        self.type = "Tank"
+        self.type = "StartFlag"
         self.speed = 5
-        self.max_atk_range = 2
-        self.damage = 6
+        self.max_atk_range = 0
+        self.damage = 0
         self.defense = 3
-        self.hit_effect = effects.Explosion
+        self.health = 30
 
+        
     def is_passable(self, tile, pos):
         """
         Returns whether or not this unit can move over a certain tile.
@@ -62,11 +61,20 @@ class Tank(GroundUnit):
         
         Overrides because tanks can't hit planes.
         """
-        # If it's an air unit return false
-        if isinstance(target_unit, unit.air_unit.AirUnit):
-            return False
+        return False
             
-        # Not an air unit, return true
-        return True
 
-unit.unit_types["Tank"] = Tank
+    def can_turn_end(self):
+        """
+        Returns whether the player turn can end.
+        """
+        # We haven't created the base, so we can't finish the turn
+        if (not self.turn_state[0] and
+            self._active):
+            return False
+        
+        # Default to the superclass
+        return super().can_turn_end()
+
+
+unit.unit_types["StartFlag"] = StartFlag

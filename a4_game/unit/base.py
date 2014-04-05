@@ -1,9 +1,9 @@
-from unit.immobile_unit import ImmobileUnit
+from unit.ground_unit import GroundUnit
 import unit, helper, effects
 from tiles import Tile
 import pygame
 
-class Base(ImmobileUnit):
+class Base(GroundUnit):
     """
     A base. High health, this is the life blood of your army.
     It allows you to create units.
@@ -25,7 +25,7 @@ class Base(ImmobileUnit):
 
         #set unit specific things.
         self.type = "Base"
-        self.speed = 0
+        self.speed = 5
         self.health = 30
         self.max_atk_range = 0
         self.damage = 0
@@ -45,6 +45,25 @@ class Base(ImmobileUnit):
             return True
             
         # Can't hit anything
+        return False
+
+    def is_passable(self, tile, pos):
+        """
+        Returns whether or not this unit can move over a certain tile.
+        """
+        #Check superclass to see if it's passable first
+        if not super().is_passable(tile, pos):
+            return False
+
+        """
+        #This unit can't pass these specific terrains
+        if (tile.type == 'mountain' or
+            tile.type == 'forest'):
+            return False
+        
+        #The tile is passable
+        return True
+        """
         return False
 
 
