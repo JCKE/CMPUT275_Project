@@ -1,23 +1,13 @@
-from unit.ground_unit import GroundUnit
+from unit.construction_unit import ConstructionUnit
 import unit, helper, effects
 from tiles import Tile
 import pygame
 
-class StartFlag(GroundUnit):
+class StartFlag(ConstructionUnit):
     """
-    A tank. Heavily armed, heavily armoured, and equipped with powerful
-    treads.
-    Armour: High
-    Speed: Medium
-    Range: Low
-    Damage: High
-    
-    Other notes:
-    - Too big to fit through a forest and too wide to fit through narrow
-      mountain passes.
-    - Its treads allow for a constant rate of movement over any terrain
-      that it can pass.
-    - Can't hit air units.
+    A start flag. Used to give player
+    some options in choosing where to
+    place their starting base.
     """
     sprite = pygame.image.load("assets/startflag.png")
     
@@ -38,22 +28,7 @@ class StartFlag(GroundUnit):
         self.defense = 3
         self.health = 30
 
-        
-    def is_passable(self, tile, pos):
-        """
-        Returns whether or not this unit can move over a certain tile.
-        """
-        #Check superclass to see if it's passable first
-        if not super().is_passable(tile, pos):
-            return False
 
-        #This unit can't pass these specific terrains
-        if (tile.type == 'mountain' or
-            tile.type == 'forest'):
-            return False
-        
-        #The tile is passable
-        return True
                                      
     def can_hit(self, target_unit):
         """

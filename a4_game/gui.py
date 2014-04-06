@@ -106,9 +106,9 @@ class GUI(LayeredUpdates):
    
     def can_build_ground_units(self):
         """
-        Checks whether the base is selected. 
+        Checks whether the Factory is selected. 
         """
-        # If the base unit is selected then we can
+        # If the Factory unit is selected then we can
         # use ground units.
         # Otherwise we can't use the buttons.
         if self.sel_unit:
@@ -132,12 +132,24 @@ class GUI(LayeredUpdates):
         """
         Checks whether the shipyard is selected. 
         """
-        # If the base unit is selected then we can
-        # use ground units.
+        # If the shipyard unit is selected then we can
+        # use water units.
         # Otherwise we can't use the buttons.
         if self.sel_unit:
             type = self.sel_unit.type
             if type != "Shipyard": return False
+        return self.sel_unit
+
+    def can_build_factory(self):
+        """
+        Checks whether the startflag is selected.
+        """
+        # If the startflag unit is selected then we can
+        # use the factory unit.
+        # Otherwise we can't use the buttons.
+        if self.sel_unit:
+            type = self.sel_unit.type
+            if type != "StartFlag": return False
         return self.sel_unit
         
     def move_pressed(self):
@@ -281,11 +293,14 @@ class GUI(LayeredUpdates):
             self.sel_unit.move_cost(self.map.tile_data(c)))
         buildable = lambda c: (
             self.sel_unit.is_buildable(self.map.tile_data(c), c))
-       
+
+        # Allow for a bigger build distance from factory for bases
         if self.current_button == "Airstrip":
             self.sel_unit.speed = 5
         elif self.current_button == "Shipyard":
             self.sel_unit.speed = 5
+        elif self.current_button == "Factory":
+            self.sel_unit.speed = 10
         else:
             self.sel_unit.speed = 2
 
@@ -299,7 +314,7 @@ class GUI(LayeredUpdates):
         # Check that the tiles can actually be stopped in
         for t_pos in available:
             tile = self.map.tile_data(t_pos)
-            # Can only build a shipyard by the water
+            # Can only build a shipyard by the water (i.o.w. on sand tiles)
             if self.current_button == "Shipyard":
                 if tile.type == "sand" and self.sel_unit.is_buildable(tile, t_pos):
                     self._buildable_tiles.add(t_pos)
@@ -326,7 +341,7 @@ class GUI(LayeredUpdates):
         unit_team = self.cur_team
         unit_angle = 0
 
-        # Make sure you are building at the right base and one tile away
+        # Make sure you are building at the right base
         if pos in self._buildable_tiles:
             unit_x, unit_y = pos[0], pos[1]
         else:
@@ -352,6 +367,9 @@ class GUI(LayeredUpdates):
             unit_name = "Shipyard"
         elif self.current_button == "Airstrip":
             unit_name = "Airstrip"
+        elif self.current_button == "Factory":
+            unit_name = "Factory"
+            self.sel_unit.deactivate() 
         else:
             raise Exception("Either team or unit is wrong team {} unit {}".format(self.cur_team, self.current_button))
 
@@ -431,7 +449,8 @@ class GUI(LayeredUpdates):
             Button(6, "Carrier", self.build_pressed, self.can_build_water_units),
             Button(7, "Battleship", self.build_pressed, self.can_build_water_units),
             Button(8, "Shipyard", self.build_pressed, self.can_build_ground_units),
-            Button(9, "Airstrip", self.build_pressed, self.can_build_ground_units)]
+            Button(9, "Airstrip", self.build_pressed, self.can_build_ground_units),
+            Button(10, "Factory", self.build_pressed, self.can_build_factory)]
 
 
         # We start in begin mode
@@ -485,6 +504,7 @@ class GUI(LayeredUpdates):
             self._attackable_tiles = set()
             self.map.remove_highlight("attack")
 
+        # Deal with the current mode
         if self.mode == Modes.ChooseSpot:
             self._buildable_tiles = set()
             self.map.remove_highlight("build")
@@ -639,6 +659,8 @@ class GUI(LayeredUpdates):
             self.current_button = "Airstrip"
         elif button[1] == "Shipyard":
             self.current_button = "Shipyard"
+        elif button[1] == "Factory":
+            self.current_button = "Factory"
         
                 
     def on_click(self, e):
@@ -664,11 +686,6 @@ class GUI(LayeredUpdates):
 
                 # get the unit at the mouseclick
                 unit = self.get_unit_at_screen_pos(e.pos)
-
-                if unit != None:
-                    type = unit.type
-                    if unit.type == "StartFlag":
-                       self.check_base = 1                    
                 
                 if unit:
                     # clicking the same unit again deselects it and, if
@@ -694,23 +711,14 @@ class GUI(LayeredUpdates):
                 else:
                     # No unit there, so a tile was clicked
 
-                    # Builds base after flag is destroyed
                     if (self.mode == Modes.ChooseMove and
-                        self.check_base == 1 and 
-                        to_tile_pos in self._movable_tiles):
-                        self.check_base = 0
-                        self.sel_unit.deactivate()
-                        self.build_base(to_tile_pos)
-                        self.sel_unit = self.get_unit_at_screen_pos(e.pos)
-                        
-                    elif (self.mode == Modes.ChooseMove and
                         self.sel_unit and
                         to_tile_pos in self._movable_tiles):
                         
-                    #    self.change_mode(Modes.Select)
                         # Move to the selected tile
                         self.sel_unit_move(to_tile_pos)
-                    # 
+
+                    # Now choosing a spot to build the unit
                     elif (self.mode == Modes.ChooseSpot and
                           self.sel_unit and
                           to_tile_pos in self._buildable_tiles):
@@ -882,35 +890,6 @@ class GUI(LayeredUpdates):
                 pos,
                 cost,
                 passable))
-
-    def build_base(self, pos):
-        # Create the units
-
-        unit_name = "Factory"
-        unit_team = self.cur_team
-        unit_x, unit_y = pos[0], pos[1]
-        unit_angle = 0
-
-        if unit_team == 0:
-            self.gteam_base = (unit_x, unit_y)
-        elif unit_team == 1:
-            self.rteam_base = (unit_x, unit_y)
-
-
-        if not unit_name in unit.unit_types:
-            raise Exception("No unit of name {} found!".format(unit_name))
-        new_unit = unit.unit_types[unit_name](team = unit_team,
-                                              tile_x = unit_x,
-                                              tile_y = unit_y,
-                                              activate = True,
-                                              angle = unit_angle)
-            
-        # Add the unit to the update group and set its display rect
-        self.update_unit_rect(new_unit)
-
-
-        self.change_mode(Modes.Select)
-
                 
     def get_unit_at_screen_pos(self, pos):
         """
