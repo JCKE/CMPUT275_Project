@@ -1,9 +1,9 @@
-from unit.immobile_unit import ImmobileUnit
+from unit.construction_unit import ConstructionUnit
 import unit, helper, effects
 from tiles import Tile
 import pygame
 
-class Shipyard(ImmobileUnit):
+class Shipyard(ConstructionUnit):
     """
     A shipyard. High health, this is the life blood of your navy.
     It allows you to create water units.
@@ -25,7 +25,7 @@ class Shipyard(ImmobileUnit):
 
         #set unit specific things.
         self.type = "Shipyard"
-        self.speed = 0
+        self.speed = 1
         self.health = 30
         self.max_atk_range = 0
         self.damage = 0
@@ -33,19 +33,19 @@ class Shipyard(ImmobileUnit):
         self.hit_effect = effects.Explosion
         self.health = 30
         
-    def can_hit(self, target_unit):
+    def is_buildable(self, tile, pos):
         """
-        Determines whether a unit can hit another unit.
-        
-        Overrides because base can't hit anything.
-        Defenses are a separate class.
+        Returns whether or not this unit can build another unit there.
         """
-        # If it's an air unit return false
-        if isinstance(target_unit, unit.air_unit.AirUnit):
-            return True
-            
-        # Can't hit anything
-        return False
+        # Make sure it's a tile
+        if not tile:
+            return False
 
+        # This unit can build on these specific terrains
+        if (tile.type == 'water'):
+            return True
+        else:
+        # Can't build on anything else
+            return False
 
 unit.unit_types["Shipyard"] = Shipyard

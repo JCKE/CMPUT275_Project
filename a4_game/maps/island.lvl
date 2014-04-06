@@ -4,7 +4,8 @@ Tile size: 20x20
 Map: maps/island.gif
 
 UNITS START
-StartFlag 0 23 22 0
+StartFlag 0 20 22 0
 StartFlag 1 10 7 0
 UNITS END
 
+      

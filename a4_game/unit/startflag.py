@@ -32,7 +32,7 @@ class StartFlag(GroundUnit):
 
         #set unit specific things.
         self.type = "StartFlag"
-        self.speed = 5
+        self.speed = 10
         self.max_atk_range = 0
         self.damage = 0
         self.defense = 3
