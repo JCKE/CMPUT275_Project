@@ -45,6 +45,8 @@ MOVE_COLOR_A = (0, 0, 160, 120)
 MOVE_COLOR_B = (105, 155, 255, 160)
 ATK_COLOR_A = (255, 0, 0, 140)
 ATK_COLOR_B = (220, 128, 0, 180)
+BLD_COLOR_A = (255, 240, 0, 80)
+BLD_COLOR_B = (252, 255, 0, 140)
 
 # RGB colors for the GUI
 FONT_COLOR = (0, 0, 0)
@@ -63,7 +65,7 @@ TEAM_NAME = {
 # http://stackoverflow.com/questions/702834/whats-the-common-practice-
 # for-enums-in-python
 class Modes:
-    Begin, Select, ChooseMove, Moving, ChooseAttack, GameOver = range(6)
+    Begin, Select, ChooseMove, Moving, ChooseAttack, GameOver, Build, ChooseSpot = range(8)
 
 # A container class which stores button information.
 # Each "slot" is a BUTTON_HEIGHT pixel space counting up from the bottom
@@ -111,7 +113,7 @@ class GUI(LayeredUpdates):
         # Otherwise we can't use the buttons.
         if self.sel_unit:
             type = self.sel_unit.type
-            if type != "Base": return False
+            if type != "Factory": return False
         return self.sel_unit
 
     def can_build_air_units(self):
@@ -257,33 +259,102 @@ class GUI(LayeredUpdates):
         # advance turn
         self.current_turn += 1
 
-    def unit_button_pressed(self):
+    def build_pressed(self):
+        """
+        This is called when one of the build buttons is pressed.
+        """
+        # Switch out of move mode if we're already in it.
+        if self.mode == Modes.Build:
+            self.change_mode(Modes.Select)
+            return
+        
+        # If there is no unit selected, nothing happens.
+        if not self.sel_unit: return
+        # Make sure you pressed a build button
+        if self.current_button ==  None: return
+
+        # Determine where we can build.
+        pos = (self.sel_unit.tile_x, self.sel_unit.tile_y)
+        
+        # These will be used in pathfinding
+        cost = lambda c: (
+            self.sel_unit.move_cost(self.map.tile_data(c)))
+        buildable = lambda c: (
+            self.sel_unit.is_buildable(self.map.tile_data(c), c))
+       
+        if self.current_button == "Airstrip":
+            self.sel_unit.speed = 5
+        elif self.current_button == "Shipyard":
+            self.sel_unit.speed = 5
+        else:
+            self.sel_unit.speed = 2
+
+        available = tiles.reachable_tiles(
+            self.map,
+            pos,
+            self.sel_unit.speed,
+            cost,
+            buildable)
+        
+        # Check that the tiles can actually be stopped in
+        for t_pos in available:
+            tile = self.map.tile_data(t_pos)
+            # Can only build a shipyard by the water
+            if self.current_button == "Shipyard":
+                if tile.type == "sand" and self.sel_unit.is_buildable(tile, t_pos):
+                    self._buildable_tiles.add(t_pos)
+            # This can be stopped in, so add it
+            elif self.sel_unit.is_buildable(tile, t_pos):
+                self._buildable_tiles.add(t_pos)
+        
+        # Highlight those squares
+        self.map.set_highlight(
+            "build", BLD_COLOR_A, BLD_COLOR_B, self._buildable_tiles)
+        
+        # Set the current GUI mode
+        self.change_mode(Modes.ChooseSpot)
+
+
+    def build_unit(self, pos):
         """
         Handles pressing one of the unit buttons.
         Builds selected unit by your team's base.
         """
-        type = self.sel_unit.type
-        # Make sure you are building at the right base and one tile away
-        if self.cur_team == 0 and type == "Base":
-            unit_x, unit_y = self.gteam_base[0], self.gteam_base[1] + 1
-        elif self.cur_team == 1 and type == "Base":
-            unit_x, unit_y = self.rteam_base[0], self.rteam_base[1] + 1
-        elif self.cur_team == 0 and type == "Airstrip":
-            unit_x, unit_y = self.gteam_airstrip[0], self.gteam_airstrip[1] + 1
-        elif self.cur_team == 1 and type == "Airstrip":
-            unit_x, unit_y = self.rteam_airstrip[0], self.rteam_airstrip[1] + 1
-        elif self.cur_team == 0 and type == "Shipyard":
-            unit_x, unit_y = self.gteam_shipyard[0], self.gteam_shipyard[1] + 1
-        elif self.cur_team == 1 and type == "Shipyard":
-            unit_x, unit_y = self.rteam_shipyard[0], self.rteam_shipyard[1] - 1
-        else:
-            raise Exception("Either team or unit is wrong team {} unit {}".format(self.cur_team, type))
+
+        # Create the units
 
         unit_team = self.cur_team
         unit_angle = 0
-        unit_name = self.current_button
 
-        # Make sure unit is in list and then assign it's info to new_unit
+        # Make sure you are building at the right base and one tile away
+        if pos in self._buildable_tiles:
+            unit_x, unit_y = pos[0], pos[1]
+        else:
+            raise Exception("Not able to build")
+            
+        if self.current_button == "Tank":
+            unit_name = "Tank"
+        elif self.current_button == "Jeep":
+            unit_name = "Jeep"
+        elif self.current_button == "Anti-Armour":
+            unit_name = "Anti-Armour"
+        elif self.current_button == "Artillery":
+            unit_name = "Artillery"
+        elif self.current_button == "Bomber":
+            unit_name = "Bomber"
+        elif self.current_button == "Fighter":
+            unit_name = "Fighter"
+        elif self.current_button == "Carrier":
+            unit_name = "Carrier"
+        elif self.current_button == "Battleship":
+            unit_name = "Battleship"
+        elif self.current_button == "Shipyard":
+            unit_name = "Shipyard"
+        elif self.current_button == "Airstrip":
+            unit_name = "Airstrip"
+        else:
+            raise Exception("Either team or unit is wrong team {} unit {}".format(self.cur_team, self.current_button))
+
         if not unit_name in unit.unit_types:
             raise Exception("No unit of name {} found!".format(unit_name))
         new_unit = unit.unit_types[unit_name](team = unit_team,
@@ -291,23 +362,15 @@ class GUI(LayeredUpdates):
                                               tile_y = unit_y,
                                               activate = True,
                                               angle = unit_angle)
-
-        if self.cur_team == 0 and self.current_button == "Base":
-            self.gteam_base = (unit_x, unit_y)
-        elif self.cur_team == 1 and self.current_button == "Base":
-            self.rteam_base = (unit_x, unit_y)
-        elif self.cur_team == 0 and self.current_button == "Airstrip":
-            self.gteam_airstrip = (unit_x, unit_y)
-        elif self.cur_team == 1 and self.current_button == "Airstrip":
-            self.rteam_airstrip = (unit_x, unit_y)
-        elif self.cur_team == 0 and self.current_button == "Shipyard":
-            self.gteam_shipyard = (unit_x, unit_y)
-        elif self.cur_team == 1 and self.current_button == "Shipyard":
-            self.rteam_shipyard = (unit_x, unit_y)
-
-
+            
         # Add the unit to the update group and set its display rect
         self.update_unit_rect(new_unit)
+
+        # Deselect to choose what you want to do next
+        self.change_mode(Modes.Select)
+        self.sel_unit = None
+
+
 
     def __init__(self, screen_rect, bg_color):
         """
@@ -353,36 +416,31 @@ class GUI(LayeredUpdates):
         self.sel_unit = None
         self.check_base = 0
         self.current_button = None
-        self.rteam_base = None
-        self.gteam_base = None
-        self.gteam_airstrip = None
-        self.rteam_airstrip = None
-        self.gteam_shipyard = None
-        self.rteam_shipyard = None
 
         # Set up GUI
         self.buttons = [
             Button(0, "MOVE", self.move_pressed, self.can_move),
             Button(1, "ATTACK", self.attack_pressed, self.can_attack),
             Button(2, "END TURN", self.end_turn_pressed, None),
-            Button(0, "Tank", self.unit_button_pressed, self.can_build_ground_units),
-            Button(1, "Jeep", self.unit_button_pressed, self.can_build_ground_units),
-            Button(2, "Anti-Armour", self.unit_button_pressed, self.can_build_ground_units),
-            Button(3, "Artillery", self.unit_button_pressed, self.can_build_ground_units),
-            Button(4, "Bomber", self.unit_button_pressed, self.can_build_air_units),
-            Button(5, "Fighter", self.unit_button_pressed, self.can_build_air_units),
-            Button(6, "Carrier", self.unit_button_pressed, self.can_build_water_units),
-            Button(7, "Battleship", self.unit_button_pressed, self.can_build_water_units),
-            Button(8, "Shipyard", self.build_aux_base, self.can_build_ground_units),
-            Button(9, "Airstrip", self.build_aux_base, self.can_build_ground_units)]
+            Button(0, "Tank", self.build_pressed, self.can_build_ground_units),
+            Button(1, "Jeep", self.build_pressed, self.can_build_ground_units),
+            Button(2, "Anti-Armour", self.build_pressed, self.can_build_ground_units),
+            Button(3, "Artillery", self.build_pressed, self.can_build_ground_units),
+            Button(4, "Bomber", self.build_pressed, self.can_build_air_units),
+            Button(5, "Fighter", self.build_pressed, self.can_build_air_units),
+            Button(6, "Carrier", self.build_pressed, self.can_build_water_units),
+            Button(7, "Battleship", self.build_pressed, self.can_build_water_units),
+            Button(8, "Shipyard", self.build_pressed, self.can_build_ground_units),
+            Button(9, "Airstrip", self.build_pressed, self.can_build_ground_units)]
 
 
         # We start in begin mode
         self.mode = Modes.Begin
         
-        # Tiles we can move to/attack
+        # Tiles we can move to/attack/build on
         self._movable_tiles = set()
         self._attackable_tiles = set()
+        self._buildable_tiles = set()
 
         # The targeting reticle
         self._reticle = animation.Animation("assets/reticle.png",
@@ -426,7 +484,11 @@ class GUI(LayeredUpdates):
             # Reset the move markers
             self._attackable_tiles = set()
             self.map.remove_highlight("attack")
-            
+
+        if self.mode == Modes.ChooseSpot:
+            self._buildable_tiles = set()
+            self.map.remove_highlight("build")
+
         self.mode = new_mode
         
     def load_level(self, filename):
@@ -562,7 +624,7 @@ class GUI(LayeredUpdates):
         elif button[1] == "Tank":
             self.current_button = "Tank"
         elif button[1] == "Jeep":
-            self.current_button = "Tank"
+            self.current_button = "Jeep"
         elif button[1] == "Anti-Armour":
             self.current_button = "Anti-Armour"
         elif button[1] == "Fighter":
@@ -632,6 +694,7 @@ class GUI(LayeredUpdates):
                 else:
                     # No unit there, so a tile was clicked
 
+                    # Builds base after flag is destroyed
                     if (self.mode == Modes.ChooseMove and
                         self.check_base == 1 and 
                         to_tile_pos in self._movable_tiles):
@@ -647,6 +710,11 @@ class GUI(LayeredUpdates):
                     #    self.change_mode(Modes.Select)
                         # Move to the selected tile
                         self.sel_unit_move(to_tile_pos)
+                    # 
+                    elif (self.mode == Modes.ChooseSpot and
+                          self.sel_unit and
+                          to_tile_pos in self._buildable_tiles):
+                        self.build_unit(to_tile_pos)
 
             # Otherwise, the user is interacting with the GUI panel
             # Make sure you aren't clicking outside button area
@@ -806,7 +874,6 @@ class GUI(LayeredUpdates):
             self.sel_unit.move_cost(self.map.tile_data(c)))
         passable = lambda c: (
             self.sel_unit.is_passable(self.map.tile_data(c), c))
-        
         #set the path in the unit.
         self.sel_unit.set_path(
             tiles.find_path(
@@ -819,7 +886,7 @@ class GUI(LayeredUpdates):
     def build_base(self, pos):
         # Create the units
 
-        unit_name = "Base"
+        unit_name = "Factory"
         unit_team = self.cur_team
         unit_x, unit_y = pos[0], pos[1]
         unit_angle = 0
