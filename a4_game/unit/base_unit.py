@@ -40,7 +40,7 @@ class BaseUnit(Sprite):
         self._active = False
         self._path = []
         self.turn_state = [False, False]
-
+        self.price = 5
         self.day = 0 # added to easily keep track of the number of days that've gone by.
         
         #Default unit stats
@@ -56,7 +56,7 @@ class BaseUnit(Sprite):
         self.move_sound = None
         self.hit_sound = None
         self.die_sound = "Explosion"
-        
+        self.price = 5
         #Dictionary of movement costs by tile type name
         self._move_costs = {}
         
@@ -79,7 +79,7 @@ class BaseUnit(Sprite):
                 return u
         
         return None
-    
+        
     @property
     def active(self):
         """

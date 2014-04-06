@@ -19,10 +19,10 @@ BUTTON_SOUND = "Button"
 MAP_WIDTH = 600
 BAR_WIDTH = 200
 BUTTON_HEIGHT = 50
-UNIT_BUTTON_HEIGHT = 40
+UNIT_BUTTON_HEIGHT = 35
 CENTER = 100
 UNITS_BARW = 115
-NUM_UNIT_BUTTONS = 11
+NUM_UNIT_BUTTONS = 12
 
 # Set the fonts
 pygame.font.init() 
@@ -70,7 +70,7 @@ class Modes:
 # A container class which stores button information.
 # Each "slot" is a BUTTON_HEIGHT pixel space counting up from the bottom
 # of the screen.
-Button = namedtuple('Button', ['slot', 'text', 'onClick', 'condition'])
+Button = namedtuple('Button', ['slot', 'text', 'onClick', 'condition', 'price'])
 
 class GUI(LayeredUpdates):
     """
@@ -369,7 +369,7 @@ class GUI(LayeredUpdates):
             unit_name = "Airstrip"
         elif self.current_button == "Factory":
             unit_name = "Factory"
-            self.sel_unit.deactivate() 
+            self.sel_unit.deactivate() # Make sure you can only build factory once
         else:
             raise Exception("Either team or unit is wrong team {} unit {}".format(self.cur_team, self.current_button))
 
@@ -380,9 +380,18 @@ class GUI(LayeredUpdates):
                                               tile_y = unit_y,
                                               activate = True,
                                               angle = unit_angle)
-            
         # Add the unit to the update group and set its display rect
         self.update_unit_rect(new_unit)
+        
+        # Subtract resources from team after building unit
+        if self.cur_team == 0:
+            self.gteam_gold -= unit.unit_types[unit_name].price()[0]
+            self.gteam_wood -= unit.unit_types[unit_name].price()[1]
+            self.gteam_food -= unit.unit_types[unit_name].price()[2]
+        elif self.cur_team == 1:
+            self.rteam_gold -= unit.unit_types[unit_name].price()[0]
+            self.rteam_wood -= unit.unit_types[unit_name].price()[1]
+            self.rteam_food -= unit.unit_types[unit_name].price()[2]
 
         # Deselect to choose what you want to do next
         self.change_mode(Modes.Select)
@@ -429,7 +438,13 @@ class GUI(LayeredUpdates):
         self.num_teams = 2
         self.current_turn = 0
         self.win_team = None 
-        
+        self.gteam_gold = 1001
+        self.gteam_wood = 1002
+        self.gteam_food = 1003
+        self.rteam_gold = 1004
+        self.rteam_wood = 1005
+        self.rteam_food = 1006
+
         # The currently selected unit
         self.sel_unit = None
         self.check_base = 0
@@ -437,21 +452,21 @@ class GUI(LayeredUpdates):
 
         # Set up GUI
         self.buttons = [
-            Button(0, "MOVE", self.move_pressed, self.can_move),
-            Button(1, "ATTACK", self.attack_pressed, self.can_attack),
-            Button(2, "END TURN", self.end_turn_pressed, None),
-            Button(0, "Tank", self.build_pressed, self.can_build_ground_units),
-            Button(1, "Jeep", self.build_pressed, self.can_build_ground_units),
-            Button(2, "Anti-Armour", self.build_pressed, self.can_build_ground_units),
-            Button(3, "Artillery", self.build_pressed, self.can_build_ground_units),
-            Button(4, "Bomber", self.build_pressed, self.can_build_air_units),
-            Button(5, "Fighter", self.build_pressed, self.can_build_air_units),
-            Button(6, "Carrier", self.build_pressed, self.can_build_water_units),
-            Button(7, "Battleship", self.build_pressed, self.can_build_water_units),
-            Button(8, "Shipyard", self.build_pressed, self.can_build_ground_units),
-            Button(9, "Airstrip", self.build_pressed, self.can_build_ground_units),
-            Button(10, "Factory", self.build_pressed, self.can_build_factory)]
-
+            Button(0, "MOVE", self.move_pressed, self.can_move, None),
+            Button(1, "ATTACK", self.attack_pressed, self.can_attack, None),
+            Button(2, "END TURN", self.end_turn_pressed, None, None),
+            Button(0, "Anti-Air", self.build_pressed, self.can_build_ground_units, unit.anti_air.AntiAir.price()),
+            Button(1, "Tank", self.build_pressed, self.can_build_ground_units, unit.tank.Tank.price()),
+            Button(2, "Jeep", self.build_pressed, self.can_build_ground_units, unit.jeep.Jeep.price()),
+            Button(3, "Anti-Armour", self.build_pressed, self.can_build_ground_units, unit.anti_armour.AntiArmour.price()),
+            Button(4, "Artillery", self.build_pressed, self.can_build_ground_units, unit.artillery.Artillery.price()),
+            Button(5, "Bomber", self.build_pressed, self.can_build_air_units, unit.bomber.Bomber.price()),
+            Button(6, "Fighter", self.build_pressed, self.can_build_air_units, unit.fighter.Fighter.price()),
+            Button(7, "Carrier", self.build_pressed, self.can_build_water_units, unit.carrier.Carrier.price()),
+            Button(8, "Battleship", self.build_pressed, self.can_build_water_units, unit.battleship.Battleship.price()),
+            Button(9, "Shipyard", self.build_pressed, self.can_build_ground_units, unit.shipyard.Shipyard.price()),
+            Button(10, "Airstrip", self.build_pressed, self.can_build_ground_units, unit.airstrip.Airstrip.price()),
+            Button(11, "Factory", self.build_pressed, self.can_build_factory, unit.factory.Factory.price())]
 
         # We start in begin mode
         self.mode = Modes.Begin
@@ -661,8 +676,8 @@ class GUI(LayeredUpdates):
             self.current_button = "Shipyard"
         elif button[1] == "Factory":
             self.current_button = "Factory"
-        
-                
+                    
+
     def on_click(self, e):
         """
         This is called when a click event occurs.
@@ -1216,10 +1231,6 @@ class GUI(LayeredUpdates):
                     line_num += 1
                     FONT.set_bold(False)
 
-#                self.draw_bar_text("Potential Damage: {}".format(pot_dmg),
-#                                    line_num)
-                                    
-
             #divider
             self.draw_bar_div_line(line_num)
             line_num += 1
@@ -1315,7 +1326,8 @@ class GUI(LayeredUpdates):
         """
         if not self.map: return
         
-        
+        line_num = 0
+
         #Determine where the mouse is
         mouse_pos = pygame.mouse.get_pos()
         coords = self.map.tile_coords(mouse_pos)
@@ -1329,11 +1341,85 @@ class GUI(LayeredUpdates):
         outlineRect.w -= 1
         outlineRect.h -= 1
         pygame.draw.rect(self.screen, OUTLINE_COLOR, outlineRect, 2)
+
+        # Draw the resources text for each team
+        self.draw_units_bar_title("RESOURCES", line_num)
+        line_num += 1
+
+        if self.cur_team == 0:
+            self.draw_units_bar_text("Gold: {}".format(self.gteam_gold), line_num)
+            line_num += 1
+            self.draw_units_bar_text("Wood: {}".format(self.gteam_wood), line_num)
+            line_num += 1
+            self.draw_units_bar_text("Food: {}".format(self.gteam_food), line_num)
+            line_num += 1
+        elif self.cur_team == 1:
+            self.draw_units_bar_text("Gold: {}".format(self.rteam_gold), line_num)
+            line_num += 1
+            self.draw_units_bar_text("Wood: {}".format(self.rteam_wood), line_num)
+            line_num += 1
+            self.draw_units_bar_text("Food: {}".format(self.rteam_food), line_num)
+            line_num += 1
+        
+        self.show_price(mouse_pos, line_num)
         
          # Only draw units buttons
         for button in range(3, len(self.buttons)):
             self.draw_units_button(self.buttons[button])
 
+    def show_price(self, coords, line_num):
+        """
+        Draws price of unit when the mouse is hovering over it.
+        Bounds the buttons in screen coordinates and then differentiates
+        between each button.
+        """
+        button_start = MAP_WIDTH - (NUM_UNIT_BUTTONS * UNIT_BUTTON_HEIGHT)
+        if coords[0] < UNITS_BARW:
+            if coords[1] >= button_start:
+                for button in self.buttons:
+                    if ((button[1] != "MOVE" and button[1] != "ATTACK" and 
+                         button[1] != "END TURN") and (NUM_UNIT_BUTTONS - 1) 
+                        - (coords[1]-button_start)//UNIT_BUTTON_HEIGHT == button[0]):
+                        self.draw_units_bar_div_line(line_num)
+                        line_num += 1
+                        self.draw_units_bar_title("COST", line_num)
+                        line_num += 1
+                        self.draw_units_bar_text("Gold: {}".format(button[4][0]), line_num)
+                        line_num += 1
+                        self.draw_units_bar_text("Wood: {}".format(button[4][1]), line_num)
+                        line_num += 1
+                        self.draw_units_bar_text("Food: {}".format(button[4][2]), line_num)
+                        line_num += 1
+
+    def draw_units_bar_text(self, text, line_num):
+        """
+        Draws text with a specified variable at a specifed line number.
+        """
+        line_text = FONT.render(text, True, FONT_COLOR)
+        self.screen.blit(
+            line_text,
+            (self.units_bar_rect.x + PAD, FONT_SIZE * line_num + PAD))
+
+    def draw_units_bar_title(self, text, line_num):
+        """
+        Draws a title at a specified line number with the specified text.
+        """
+        title_text = FONT.render(text, True, FONT_COLOR)
+        self.screen.blit(
+            title_text,
+            (self.units_bar_rect.centerx - (title_text.get_width()/2),
+            FONT_SIZE * line_num + PAD))
+
+    def draw_units_bar_div_line(self, line_num):
+        """
+        Draws a dividing line at a specified line number.
+        """
+        y = FONT_SIZE * line_num + FONT_SIZE//2 + PAD
+        pygame.draw.line(
+            self.screen,
+            (50, 50, 50),
+            (self.units_bar_rect.x, y),
+            (self.units_bar_rect.right, y))
 
     def draw_units_button(self, button):
         """
@@ -1341,7 +1427,6 @@ class GUI(LayeredUpdates):
         If the mouse is hovering over the button it is rendered in white,
         else rgb(50, 50, 50).
         """
-
         but_rect = self.get_unit_button_rect(button)
 
         # The outline needs a slightly smaller rectangle
@@ -1372,7 +1457,7 @@ class GUI(LayeredUpdates):
         self.screen.blit(
             but_text,
             (self.units_bar_rect.centerx - (but_text.get_width()/2),
-            but_rect.y + (UNIT_BUTTON_HEIGHT//2) - but_text.get_height()//2))
+            but_rect.y + (UNIT_BUTTON_HEIGHT//2) - (but_text.get_height()//2)))
 
 
     def get_unit_button_rect(self, button):

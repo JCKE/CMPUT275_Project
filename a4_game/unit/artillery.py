@@ -41,7 +41,7 @@ class Artillery(GroundUnit):
         self.damage = 7
         self.defense = 1
         self.hit_effect = effects.Explosion
-        
+        self.price = 20
         self._move_costs = {'plains': 1.5,
                              'sand': 1.5,
                              'road': 1,
@@ -93,5 +93,7 @@ class Artillery(GroundUnit):
         if min_range <= dist and dist <= max_range:
             return True
         return False
+
+    def price(): return (50, 25, 45)
 
 unit.unit_types["Artillery"] = Artillery

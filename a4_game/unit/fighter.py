@@ -66,4 +66,6 @@ class Fighter(AirUnit):
             return damage - defense
         else: return super().get_damage(target, target_tile)
 
+    def price(): return (50, 75, 25)
+    
 unit.unit_types["Fighter"] = Fighter

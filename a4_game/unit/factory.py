@@ -32,4 +32,6 @@ class Factory(ConstructionUnit):
         self.defense = 2
         self.hit_effect = effects.Explosion
 
+    def price(): return (0,0,0)
+
 unit.unit_types["Factory"] = Factory

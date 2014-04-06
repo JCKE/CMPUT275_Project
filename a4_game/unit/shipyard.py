@@ -48,4 +48,6 @@ class Shipyard(ConstructionUnit):
         # Can't build on anything else
             return False
 
+    def price(): return (200, 200, 200)
+
 unit.unit_types["Shipyard"] = Shipyard

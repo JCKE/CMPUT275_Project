@@ -46,6 +46,7 @@ class Bomber(AirUnit):
         self.set_fuel(self.max_fuel)
         self.min_move_distance = 4
         self.hit_effect = effects.Explosion
+        self.price = 20
         
     def get_damage(self, target, target_tile):
         """
@@ -112,4 +113,6 @@ class Bomber(AirUnit):
         # Not an air unit, return true
         return True
 
+    def price(): return (50, 80, 25)
+    
 unit.unit_types["Bomber"] = Bomber
