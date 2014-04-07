@@ -601,6 +601,7 @@ class GUI(LayeredUpdates):
                                               angle = unit_angle)
         # Add the unit to the update group and set its display rect
         self.update_unit_rect(new_unit)
+        new_unit._update_image()
         
         # Subtract resources from team after building unit
         if self.cur_team == 0:
