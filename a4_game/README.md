@@ -100,6 +100,23 @@ The following stats are displayed for tiles:
 
 **NOTE**: tile bonuses do not apply to aircraft!
 
+On the left are buttons for building units and displays resource information.
+
+In the top, left corner:
+- **RESOURCES**: your team's total gold, wood and food resources
+- **COST**: when hovering over an appropriate unit it shows how many resources
+  it requires to build it
+
+The buttons will be activated only when the approperiate base is selected. At the starting
+turn you are required to select the start flag of your team color and click the highlighted
+factory button. Once you have done so, a yellow highlighted radius will appear around your
+flag. These squares represent where you can build your base, the yellow radi apply to all
+three base types. Left clicking the highlighted buttons will allow you to build.
+The bases are:
+- Factory: main base where you can build ground units and other bases from it. No cost.
+- Airstrip: allows you to build and refuel air units. Not free to build.
+- Shipyard: allows you to build water units. Not free to build. Must be built on a sand tile.
+
 Sound Credits
 -------------
 All sounds are from FreeSound.org, released under public domain/Creative Commons
