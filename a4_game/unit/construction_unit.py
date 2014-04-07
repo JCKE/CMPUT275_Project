@@ -21,9 +21,6 @@ class ConstructionUnit(BaseUnit):
     def can_hit(self, target_unit):
         """
         Determines whether a unit can hit another unit.
-        
-        Overrides because airstrip can't hit anything.
-        Defenses are a separate class.
         """
         # If it's an air unit return false
         if isinstance(target_unit, unit.air_unit.AirUnit):

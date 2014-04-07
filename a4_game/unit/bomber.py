@@ -46,7 +46,6 @@ class Bomber(AirUnit):
         self.set_fuel(self.max_fuel)
         self.min_move_distance = 4
         self.hit_effect = effects.Explosion
-        self.price = 20
         
     def get_damage(self, target, target_tile):
         """
@@ -56,7 +55,8 @@ class Bomber(AirUnit):
         special damage effects.
         """
         # Do bonus damage to land units
-        if isinstance(target, unit.ground_unit.GroundUnit):
+        if(isinstance(target, unit.ground_unit.GroundUnit) or 
+                    isinstance(target, unit.construction_unit.ConstructionUnit)):
             # Calculate the total damage
             damage = self.damage + self.bonus_land_damage
             
