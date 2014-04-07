@@ -17,6 +17,7 @@ main_gui.load_level("maps/" + level + ".lvl")
 
 # The main game loop
 while 1:
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.display.quit()
@@ -31,7 +32,7 @@ while 1:
             main_gui.on_click(event)
         # Allows player to use enter/return to end turn
         elif (event.type == pygame.KEYDOWN and 
-              event.key == pygame.K_RETURN):
+              (event.key == pygame.K_RETURN or event.key == pygame.K_d)):
             main_gui.on_click(event)
     main_gui.update()
     main_gui.draw()
