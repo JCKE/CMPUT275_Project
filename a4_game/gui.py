@@ -1037,6 +1037,12 @@ class GUI(LayeredUpdates):
         # Pressing enter/return ends the turn
         elif(e.type == pygame.KEYDOWN and e.key == pygame.K_RETURN):
             self.buttons[2].onClick()
+
+        elif(e.type == pygame.KEYDOWN and e.key == pygame.K_d):
+#            type = self.sel_unit.type
+            print("are we getting here?")
+#            self.sel_unit.deactivate()
+            
             
     def sel_unit_attack(self, pos):
         """
