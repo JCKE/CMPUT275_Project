@@ -10,7 +10,7 @@ main_gui = GUI(RESOLUTION, BG_COLOR)
 clock = pygame.time.Clock()
 argv = sys.argv[1:]
 # If a filename was given, load that level. Otherwise, load a default.
-level = "island"
+level = "map-1"
 if len(argv) > 0:
     level = argv[0]
 main_gui.load_level("maps/" + level + ".lvl")
