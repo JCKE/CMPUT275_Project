@@ -152,6 +152,219 @@ class GUI(LayeredUpdates):
             if type != "StartFlag": return False
         return self.sel_unit
         
+    def check_resources(self):
+        """
+        Makes sure players can't use negative resources.
+        """
+        if self.cur_team == 0:
+            if self.current_button == "Tank":
+                if self.gteam_gold - unit.tank.Tank.price()[0] < 0:
+                    return False
+                elif self.gteam_wood - unit.tank.Tank.price()[1] < 0:
+                    return False
+                elif self.gteam_food - unit.tank.Tank.price()[2] < 0:
+                    return False
+                else:
+                    return True
+            elif self.current_button == "Anti-Air":
+                if self.gteam_gold - unit.anti_air.AntiAir.price()[0] < 0:
+                    return False
+                elif self.gteam_wood - unit.anti_air.AntiAir.price()[1] < 0:
+                    return False
+                elif self.gteam_food - unit.anti_air.AntiAir.price()[2] < 0:
+                    return False
+                else:
+                    return True
+            elif self.current_button == "Jeep":
+                if self.gteam_gold - unit.jeep.Jeep.price()[0] < 0:
+                    return False
+                elif self.gteam_wood - unit.jeep.Jeep.price()[1] < 0:
+                    return False
+                elif self.gteam_food - unit.jeep.Jeep.price()[2] < 0:
+                    return False                
+                else:
+                    return True
+            elif self.current_button == "Anti-Armour":
+                if self.gteam_gold - unit.anti_armour.AntiArmour.price()[0] < 0:
+                    return False
+                elif self.gteam_wood - unit.anti_armour.AntiArmour.price()[1] < 0:
+                    return False
+                elif self.gteam_food - unit.anti_armour.AntiArmour.price()[2] < 0:
+                    return False
+                else:
+                    return True
+            elif self.current_button == "Artillery":
+                if self.gteam_gold - unit.artillery.Artillery.price()[0] < 0:
+                    return False
+                elif self.gteam_wood - unit.artillery.Artillery.price()[1] < 0:
+                    return False
+                elif self.gteam_food - unit.artillery.Artillery.price()[2] < 0:
+                    return False                
+                else:
+                    return True
+            elif self.current_button == "Bomber":
+                if self.gteam_gold - unit.bomber.Bomber.price()[0] < 0:
+                    return False
+                elif self.gteam_wood - unit.bomber.Bomber.price()[1] < 0:
+                    return False
+                elif self.gteam_food - unit.bomber.Bomber.price()[2] < 0:
+                    return False
+                else:
+                    return True
+            elif self.current_button == "Fighter":
+                if self.gteam_gold - unit.fighter.Fighter.price()[0] < 0:
+                    return False
+                elif self.gteam_wood - unit.fighter.Fighter.price()[1] < 0:
+                    return False
+                elif self.gteam_food - unit.fighter.Fighter.price()[2] < 0:
+                    return False
+                else:
+                    return True
+            elif self.current_button == "Carrier":
+                if self.gteam_gold - unit.carrier.Carrier.price()[0] < 0:
+                    return False
+                elif self.gteam_wood - unit.carrier.Carrier.price()[1] < 0:
+                    return False
+                elif self.gteam_food - unit.carrier.Carrier.price()[2] < 0:
+                    return False
+                else:
+                    return True
+            elif self.current_button == "Battleship":
+                if self.gteam_gold - unit.battleship.Battleship.price()[0] < 0:
+                    return False
+                elif self.gteam_wood - unit.battleship.Battleship.price()[1] < 0:
+                    return False
+                elif self.gteam_food - unit.battleship.Battleship.price()[2] < 0:
+                    return False
+                else:
+                    return True
+            elif self.current_button == "Shipyard":
+                if self.gteam_gold - unit.shipyard.Shipyard.price()[0] < 0: 
+                    return False 
+                elif self.gteam_wood - unit.shipyard.Shipyard.price()[1] < 0:
+                    return False 
+                elif self.gteam_food - unit.shipyard.Shipyard.price()[2] < 0:
+                    return False
+                else:
+                    return True
+            elif self.current_button == "Airstrip":
+                print("getting here")
+                if self.gteam_gold - unit.airstrip.Airstrip.price()[0] < 0: 
+                    return False 
+                elif self.gteam_wood - unit.airstrip.Airstrip.price()[1] < 0:
+                    return False 
+                elif self.gteam_food - unit.airstrip.Airstrip.price()[2] < 0:
+                    return False
+                else:
+                    return True
+            else:
+                return True
+        elif self.cur_team == 1:
+            if self.current_button == "Tank":
+                if self.rteam_gold - unit.tank.Tank.price()[0] < 0:
+                    return False
+                elif self.rteam_wood - unit.tank.Tank.price()[1] < 0:
+                    return False
+                elif self.rteam_food - unit.tank.Tank.price()[2] < 0:
+                    return False
+                else:
+                    return True
+            elif self.current_button == "Anti-Air":
+                if self.rteam_gold - unit.anti_air.AntiAir.price()[0] < 0:
+                    return False
+                elif self.rteam_wood - unit.anti_air.AntiAir.price()[1] < 0:
+                    return False
+                elif self.rteam_food - unit.anti_air.AntiAir.price()[2] < 0:
+                    return False
+                else:
+                    return True
+            elif self.current_button == "Jeep":
+                if self.rteam_gold - unit.jeep.Jeep.price()[0] < 0:
+                    return False
+                elif self.rteam_wood - unit.jeep.Jeep.price()[1] < 0:
+                    return False
+                elif self.rteam_food - unit.jeep.Jeep.price()[2] < 0:
+                    return False                
+                else:
+                    return True
+            elif self.current_button == "Anti-Armour":
+                if self.rteam_gold - unit.anti_armour.AntiArmour.price()[0] < 0:
+                    return False
+                elif self.rteam_wood - unit.anti_armour.AntiArmour.price()[1] < 0:
+                    return False
+                elif self.rteam_food - unit.anti_armour.AntiArmour.price()[2] < 0:
+                    return False
+                else:
+                    return True
+            elif self.current_button == "Artillery":
+                if self.rteam_gold - unit.artillery.Artillery.price()[0] < 0:
+                    return False
+                elif self.rteam_wood - unit.artillery.Artillery.price()[1] < 0:
+                    return False
+                elif self.rteam_food - unit.artillery.Artillery.price()[2] < 0:
+                    return False                
+                else:
+                    return True
+            elif self.current_button == "Bomber":
+                if self.rteam_gold - unit.bomber.Bomber.price()[0] < 0:
+                    return False
+                elif self.rteam_wood - unit.bomber.Bomber.price()[1] < 0:
+                    return False
+                elif self.rteam_food - unit.bomber.Bomber.price()[2] < 0:
+                    return False
+                else:
+                    return True
+            elif self.current_button == "Fighter":
+                if self.rteam_gold - unit.fighter.Fighter.price()[0] < 0:
+                    return False
+                elif self.rteam_wood - unit.fighter.Fighter.price()[1] < 0:
+                    return False
+                elif self.rteam_food - unit.fighter.Fighter.price()[2] < 0:
+                    return False
+                else:
+                    return True
+            elif self.current_button == "Carrier":
+                if self.rteam_gold - unit.carrier.Carrier.price()[0] < 0:
+                    return False
+                elif self.rteam_wood - unit.carrier.Carrier.price()[1] < 0:
+                    return False
+                elif self.rteam_food - unit.carrier.Carrier.price()[2] < 0:
+                    return False
+                else:
+                    return True
+            elif self.current_button == "Battleship":
+                if self.rteam_gold - unit.battleship.Battleship.price()[0] < 0:
+                    return False
+                elif self.rteam_wood - unit.battleship.Battleship.price()[1] < 0:
+                    return False
+                elif self.rteam_food - unit.battleship.Battleship.price()[2] < 0:
+                    return False
+                else:
+                    return True
+            elif self.current_button == "Shipyard":
+                if self.rteam_gold - unit.shipyard.Shipyard.price()[0] < 0: 
+                    return False 
+                elif self.rteam_wood - unit.shipyard.Shipyard.price()[1] < 0:
+                    return False 
+                elif self.rteam_food - unit.shipyard.Shipyard.price()[2] < 0:
+                    return False
+                else:
+                    return True
+            elif self.current_button == "Airstrip":
+                print("getting here")
+                if self.rteam_gold - unit.airstrip.Airstrip.price()[0] < 0: 
+                    return False 
+                elif self.rteam_wood - unit.airstrip.Airstrip.price()[1] < 0:
+                    return False 
+                elif self.rteam_food - unit.airstrip.Airstrip.price()[2] < 0:
+                    return False
+                else:
+                    return True
+            else:
+                return True
+        else:
+            raise Exception("Where is your team?")
+
     def move_pressed(self):
         """
         This is called when the move button is pressed.
@@ -279,7 +492,11 @@ class GUI(LayeredUpdates):
         if self.mode == Modes.Build:
             self.change_mode(Modes.Select)
             return
-        
+
+        # Make sure players can't go into the overdraft
+        if self.check_resources() == False:
+            return
+
         # If there is no unit selected, nothing happens.
         if not self.sel_unit: return
         # Make sure you pressed a build button
@@ -349,6 +566,8 @@ class GUI(LayeredUpdates):
             
         if self.current_button == "Tank":
             unit_name = "Tank"
+        elif self.current_button == "Anti-Air":
+            unit_name = "Anti-Air"
         elif self.current_button == "Jeep":
             unit_name = "Jeep"
         elif self.current_button == "Anti-Armour":
@@ -449,7 +668,6 @@ class GUI(LayeredUpdates):
         self.sel_unit = None
         self.check_base = 0
         self.current_button = None
-
         # Set up GUI
         self.buttons = [
             Button(0, "MOVE", self.move_pressed, self.can_move, None),
@@ -656,6 +874,8 @@ class GUI(LayeredUpdates):
         """
         if button[1] == "Artillery":
             self.current_button = "Artillery"
+        elif button[1] == "Anti-Air":
+            self.current_button = "Anti-Air"
         elif button[1] == "Tank":
             self.current_button = "Tank"
         elif button[1] == "Jeep":
