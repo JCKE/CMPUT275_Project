@@ -157,6 +157,7 @@ class GUI(LayeredUpdates):
         Makes sure players can't use negative resources.
         """
         if self.cur_team == 0:
+
             if self.current_button == "Tank":
                 if self.gteam_gold - unit.tank.Tank.price()[0] < 0:
                     return False
@@ -166,6 +167,7 @@ class GUI(LayeredUpdates):
                     return False
                 else:
                     return True
+
             elif self.current_button == "Anti-Air":
                 if self.gteam_gold - unit.anti_air.AntiAir.price()[0] < 0:
                     return False
@@ -175,6 +177,7 @@ class GUI(LayeredUpdates):
                     return False
                 else:
                     return True
+
             elif self.current_button == "Jeep":
                 if self.gteam_gold - unit.jeep.Jeep.price()[0] < 0:
                     return False
@@ -184,6 +187,7 @@ class GUI(LayeredUpdates):
                     return False                
                 else:
                     return True
+
             elif self.current_button == "Anti-Armour":
                 if self.gteam_gold - unit.anti_armour.AntiArmour.price()[0] < 0:
                     return False
@@ -193,6 +197,7 @@ class GUI(LayeredUpdates):
                     return False
                 else:
                     return True
+
             elif self.current_button == "Artillery":
                 if self.gteam_gold - unit.artillery.Artillery.price()[0] < 0:
                     return False
@@ -202,6 +207,7 @@ class GUI(LayeredUpdates):
                     return False                
                 else:
                     return True
+
             elif self.current_button == "Bomber":
                 if self.gteam_gold - unit.bomber.Bomber.price()[0] < 0:
                     return False
@@ -211,6 +217,7 @@ class GUI(LayeredUpdates):
                     return False
                 else:
                     return True
+
             elif self.current_button == "Fighter":
                 if self.gteam_gold - unit.fighter.Fighter.price()[0] < 0:
                     return False
@@ -220,6 +227,7 @@ class GUI(LayeredUpdates):
                     return False
                 else:
                     return True
+
             elif self.current_button == "Carrier":
                 if self.gteam_gold - unit.carrier.Carrier.price()[0] < 0:
                     return False
@@ -229,6 +237,7 @@ class GUI(LayeredUpdates):
                     return False
                 else:
                     return True
+
             elif self.current_button == "Battleship":
                 if self.gteam_gold - unit.battleship.Battleship.price()[0] < 0:
                     return False
@@ -238,6 +247,7 @@ class GUI(LayeredUpdates):
                     return False
                 else:
                     return True
+
             elif self.current_button == "Shipyard":
                 if self.gteam_gold - unit.shipyard.Shipyard.price()[0] < 0: 
                     return False 
@@ -247,8 +257,8 @@ class GUI(LayeredUpdates):
                     return False
                 else:
                     return True
+
             elif self.current_button == "Airstrip":
-                print("getting here")
                 if self.gteam_gold - unit.airstrip.Airstrip.price()[0] < 0: 
                     return False 
                 elif self.gteam_wood - unit.airstrip.Airstrip.price()[1] < 0:
@@ -259,7 +269,9 @@ class GUI(LayeredUpdates):
                     return True
             else:
                 return True
+
         elif self.cur_team == 1:
+
             if self.current_button == "Tank":
                 if self.rteam_gold - unit.tank.Tank.price()[0] < 0:
                     return False
@@ -269,6 +281,7 @@ class GUI(LayeredUpdates):
                     return False
                 else:
                     return True
+
             elif self.current_button == "Anti-Air":
                 if self.rteam_gold - unit.anti_air.AntiAir.price()[0] < 0:
                     return False
@@ -278,6 +291,7 @@ class GUI(LayeredUpdates):
                     return False
                 else:
                     return True
+
             elif self.current_button == "Jeep":
                 if self.rteam_gold - unit.jeep.Jeep.price()[0] < 0:
                     return False
@@ -287,6 +301,7 @@ class GUI(LayeredUpdates):
                     return False                
                 else:
                     return True
+
             elif self.current_button == "Anti-Armour":
                 if self.rteam_gold - unit.anti_armour.AntiArmour.price()[0] < 0:
                     return False
@@ -296,6 +311,7 @@ class GUI(LayeredUpdates):
                     return False
                 else:
                     return True
+
             elif self.current_button == "Artillery":
                 if self.rteam_gold - unit.artillery.Artillery.price()[0] < 0:
                     return False
@@ -305,6 +321,7 @@ class GUI(LayeredUpdates):
                     return False                
                 else:
                     return True
+
             elif self.current_button == "Bomber":
                 if self.rteam_gold - unit.bomber.Bomber.price()[0] < 0:
                     return False
@@ -314,6 +331,7 @@ class GUI(LayeredUpdates):
                     return False
                 else:
                     return True
+
             elif self.current_button == "Fighter":
                 if self.rteam_gold - unit.fighter.Fighter.price()[0] < 0:
                     return False
@@ -323,6 +341,7 @@ class GUI(LayeredUpdates):
                     return False
                 else:
                     return True
+
             elif self.current_button == "Carrier":
                 if self.rteam_gold - unit.carrier.Carrier.price()[0] < 0:
                     return False
@@ -332,6 +351,7 @@ class GUI(LayeredUpdates):
                     return False
                 else:
                     return True
+
             elif self.current_button == "Battleship":
                 if self.rteam_gold - unit.battleship.Battleship.price()[0] < 0:
                     return False
@@ -341,6 +361,7 @@ class GUI(LayeredUpdates):
                     return False
                 else:
                     return True
+
             elif self.current_button == "Shipyard":
                 if self.rteam_gold - unit.shipyard.Shipyard.price()[0] < 0: 
                     return False 
@@ -350,8 +371,8 @@ class GUI(LayeredUpdates):
                     return False
                 else:
                     return True
+
             elif self.current_button == "Airstrip":
-                print("getting here")
                 if self.rteam_gold - unit.airstrip.Airstrip.price()[0] < 0: 
                     return False 
                 elif self.rteam_wood - unit.airstrip.Airstrip.price()[1] < 0:
@@ -364,6 +385,125 @@ class GUI(LayeredUpdates):
                 return True
         else:
             raise Exception("Where is your team?")
+
+    def update_resources(self, unit_name):
+        """
+        Updates resources if unit is deleted.
+        Gives back half of original price.
+        """
+        if self.cur_team == 0:
+
+            if unit_name == "Tank":
+                self.gteam_gold += unit.tank.Tank.price()[0] // 2
+                self.gteam_wood += unit.tank.Tank.price()[1] // 2
+                self.gteam_food += unit.tank.Tank.price()[2] // 2
+
+            elif unit_name == "Anti-Air":
+                self.gteam_gold += unit.anti_air.AntiAir.price()[0] // 2
+                self.gteam_wood += unit.anti_air.AntiAir.price()[1] // 2
+                self.gteam_food += unit.anti_air.AntiAir.price()[2] // 2
+
+            elif unit_name == "Jeep":
+                self.gteam_gold += unit.jeep.Jeep.price()[0] // 2
+                self.gteam_wood += unit.jeep.Jeep.price()[1] // 2
+                self.gteam_food += unit.jeep.Jeep.price()[2] // 2
+                
+            elif unit_name == "Anti-Armour":
+                self.gteam_gold += unit.anti_armour.AntiArmour.price()[0] // 2
+                self.gteam_wood += unit.anti_armour.AntiArmour.price()[1] // 2
+                self.gteam_food += unit.anti_armour.AntiArmour.price()[2] // 2
+                
+            elif unit_name == "Artillery":
+                self.gteam_gold += unit.artillery.Artillery.price()[0] // 2
+                self.gteam_wood += unit.artillery.Artillery.price()[1] // 2
+                self.gteam_food += unit.artillery.Artillery.price()[2] // 2
+                 
+            elif unit_name == "Bomber":
+                self.gteam_gold += unit.bomber.Bomber.price()[0] // 2
+                self.gteam_wood += unit.bomber.Bomber.price()[1] // 2
+                self.gteam_food += unit.bomber.Bomber.price()[2] // 2
+                
+            elif unit_name == "Fighter":
+                self.gteam_gold += unit.fighter.Fighter.price()[0] // 2
+                self.gteam_wood += unit.fighter.Fighter.price()[1] // 2
+                self.gteam_food += unit.fighter.Fighter.price()[2] // 2
+                
+            elif unit_name == "Carrier":
+                self.gteam_gold += unit.carrier.Carrier.price()[0] // 2
+                self.gteam_wood += unit.carrier.Carrier.price()[1] // 2
+                self.gteam_food += unit.carrier.Carrier.price()[2] // 2
+
+            elif unit_name == "Battleship":
+                self.gteam_gold += unit.battleship.Battleship.price()[0] // 2
+                self.gteam_wood += unit.battleship.Battleship.price()[1] // 2
+                self.gteam_food += unit.battleship.Battleship.price()[2] // 2
+
+            elif unit_name == "Shipyard":
+                self.gteam_gold += unit.shipyard.Shipyard.price()[0] // 2 
+                self.gteam_wood += unit.shipyard.Shipyard.price()[1] // 2
+                self.gteam_food += unit.shipyard.Shipyard.price()[2] // 2
+                
+            elif unit_name == "Airstrip":
+                self.gteam_gold += unit.airstrip.Airstrip.price()[0] // 2 
+                self.gteam_wood += unit.airstrip.Airstrip.price()[1] // 2
+                self.gteam_food += unit.airstrip.Airstrip.price()[2] // 2
+                
+        elif self.cur_team == 1:
+
+            if unit_name == "Tank":
+                self.rteam_gold += unit.tank.Tank.price()[0] // 2
+                self.rteam_wood += unit.tank.Tank.price()[1] // 2
+                self.rteam_food += unit.tank.Tank.price()[2] // 2
+
+            elif unit_name == "Anti-Air":
+                self.rteam_gold += unit.anti_air.AntiAir.price()[0] // 2
+                self.rteam_wood += unit.anti_air.AntiAir.price()[1] // 2
+                self.rteam_food += unit.anti_air.AntiAir.price()[2] // 2
+
+            elif unit_name == "Jeep":
+                self.rteam_gold += unit.jeep.Jeep.price()[0] // 2
+                self.rteam_wood += unit.jeep.Jeep.price()[1] // 2
+                self.rteam_food += unit.jeep.Jeep.price()[2] // 2
+                
+            elif unit_name == "Anti-Armour":
+                self.rteam_gold += unit.anti_armour.AntiArmour.price()[0] // 2
+                self.rteam_wood += unit.anti_armour.AntiArmour.price()[1] // 2
+                self.rteam_food += unit.anti_armour.AntiArmour.price()[2] // 2
+                
+            elif unit_name == "Artillery":
+                self.rteam_gold += unit.artillery.Artillery.price()[0] // 2
+                self.rteam_wood += unit.artillery.Artillery.price()[1] // 2
+                self.rteam_food += unit.artillery.Artillery.price()[2] // 2
+                 
+            elif unit_name == "Bomber":
+                self.rteam_gold += unit.bomber.Bomber.price()[0] // 2
+                self.rteam_wood += unit.bomber.Bomber.price()[1] // 2
+                self.rteam_food += unit.bomber.Bomber.price()[2] // 2
+                
+            elif unit_name == "Fighter":
+                self.rteam_gold += unit.fighter.Fighter.price()[0] // 2
+                self.rteam_wood += unit.fighter.Fighter.price()[1] // 2
+                self.rteam_food += unit.fighter.Fighter.price()[2] // 2
+                
+            elif unit_name == "Carrier":
+                self.rteam_gold += unit.carrier.Carrier.price()[0] // 2
+                self.rteam_wood += unit.carrier.Carrier.price()[1] // 2
+                self.rteam_food += unit.carrier.Carrier.price()[2] // 2
+
+            elif unit_name == "Battleship":
+                self.rteam_gold += unit.battleship.Battleship.price()[0] // 2
+                self.rteam_wood += unit.battleship.Battleship.price()[1] // 2
+                self.rteam_food += unit.battleship.Battleship.price()[2] // 2
+
+            elif unit_name == "Shipyard":
+                self.rteam_gold += unit.shipyard.Shipyard.price()[0] // 2 
+                self.rteam_wood += unit.shipyard.Shipyard.price()[1] // 2
+                self.rteam_food += unit.shipyard.Shipyard.price()[2] // 2
+                
+            elif unit_name == "Airstrip":
+                self.rteam_gold += unit.airstrip.Airstrip.price()[0] // 2 
+                self.rteam_wood += unit.airstrip.Airstrip.price()[1] // 2
+                self.rteam_food += unit.airstrip.Airstrip.price()[2] // 2
 
     def move_pressed(self):
         """
@@ -909,7 +1049,6 @@ class GUI(LayeredUpdates):
         if (self.mode == Modes.Moving or
             self.mode == Modes.GameOver):
             return
-        
         # make sure we have focus and that it was the left mouse button
         if (e.type == pygame.MOUSEBUTTONUP
             and e.button == 1
@@ -935,8 +1074,7 @@ class GUI(LayeredUpdates):
                           unit.team == self.cur_team):
                         self.sel_unit = unit
                         SoundManager.play(SELECT_SOUND)
-                        self.buttons[0].onClick()
-                        
+                        self.buttons[0].onClick()                        
                         
                     # Attack
                     elif (self.mode == Modes.ChooseAttack and
@@ -990,9 +1128,6 @@ class GUI(LayeredUpdates):
                             # Play the button sound
                             SoundManager.play(BUTTON_SOUND)
 
-
-
-
         # make sure we have focus and that it was the right mouse button
         elif (e.type == pygame.MOUSEBUTTONUP
             and e.button == 3
@@ -1038,11 +1173,18 @@ class GUI(LayeredUpdates):
         elif(e.type == pygame.KEYDOWN and e.key == pygame.K_RETURN):
             self.buttons[2].onClick()
 
+        # Pressing d allows you to delete a unit and gain resources back
+        # Makes sure you can't delete factory or startflag
+        # Changes mode back to select afterwards
         elif(e.type == pygame.KEYDOWN and e.key == pygame.K_d):
-#            type = self.sel_unit.type
-            print("are we getting here?")
-#            self.sel_unit.deactivate()
-            
+            if self.sel_unit != None:
+                type = self.sel_unit.type
+                if (self.sel_unit.type != "StartFlag" and
+                    self.sel_unit.type != "Factory"):
+                    self.sel_unit.deactivate()
+                    self.update_resources(self.sel_unit.type)
+                    self.change_mode(Modes.Select)
+                    self.sel_unit = None
             
     def sel_unit_attack(self, pos):
         """
