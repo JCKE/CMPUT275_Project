@@ -798,12 +798,12 @@ class GUI(LayeredUpdates):
         self.num_teams = 2
         self.current_turn = 0
         self.win_team = None 
-        self.gteam_gold = 1001
-        self.gteam_wood = 1002
-        self.gteam_food = 1003
-        self.rteam_gold = 1004
-        self.rteam_wood = 1005
-        self.rteam_food = 1006
+        self.gteam_gold = 50
+        self.gteam_wood = 50
+        self.gteam_food = 80
+        self.rteam_gold = 50
+        self.rteam_wood = 50
+        self.rteam_food = 80
 
         # The currently selected unit
         self.sel_unit = None
