@@ -14,7 +14,9 @@ Changes on the PyGame side include:
 - Making a 'home base' where the units created will spawn
 - Communication to the Arduino client and a resource exchange system between turns
 - Create two other home base types: one builds water units and the other air units while the home base will build land units
+- Added a function to the d button: deletes selected unit and returns half of original resource price
 - If time permits, make turret style base defenses and other unit types
+- Made the wall tile into a bridge so that water and ground units can pass over it
 
 To accomplish our project, we would need to borrow a larger LCD screen like one of the touch screens for the Arduino players to play on. We may end up using touch functionality too depending on how far we get.
 

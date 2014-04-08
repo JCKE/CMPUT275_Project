@@ -33,7 +33,7 @@ class WaterUnit(BaseUnit):
             return False
         
         #ground units can't travel over water.
-        if (tile.type != 'water'):
+        if ((tile.type != 'water') and (tile.type != 'wall')):
             return False
 
         return True
