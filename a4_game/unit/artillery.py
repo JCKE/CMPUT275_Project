@@ -94,6 +94,6 @@ class Artillery(GroundUnit):
             return True
         return False
 
-    def price(): return (50, 25, 45)
+    def price(): return (50, 50, 50)
 
 unit.unit_types["Artillery"] = Artillery
