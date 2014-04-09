@@ -61,16 +61,19 @@ TEAM_NAME = {
     1: "red"
 }
 
+
 # Possible GUI modes
 # http://stackoverflow.com/questions/702834/whats-the-common-practice-
 # for-enums-in-python
 class Modes:
     Begin, Select, ChooseMove, Moving, ChooseAttack, GameOver, Build, ChooseSpot = range(8)
 
+
 # A container class which stores button information.
 # Each "slot" is a BUTTON_HEIGHT pixel space counting up from the bottom
 # of the screen.
 Button = namedtuple('Button', ['slot', 'text', 'onClick', 'condition', 'price'])
+
 
 class GUI(LayeredUpdates):
     """
@@ -93,6 +96,7 @@ class GUI(LayeredUpdates):
         
         # If the unit is done its move, we also can't.
         return not self.sel_unit.turn_state[0]
+
     
     def can_attack(self):
         """
@@ -103,6 +107,7 @@ class GUI(LayeredUpdates):
         
         # If the unit is done its attack, we also can't.
         return not self.sel_unit.turn_state[1]
+
    
     def can_build_ground_units(self):
         """
@@ -116,6 +121,7 @@ class GUI(LayeredUpdates):
             if type != "Factory": return False
         return self.sel_unit
 
+
     def can_build_air_units(self):
         """
         Checks whether the airstrip is selected. 
@@ -127,6 +133,7 @@ class GUI(LayeredUpdates):
             type = self.sel_unit.type
             if type != "Airstrip": return False
         return self.sel_unit
+
 
     def can_build_water_units(self):
         """
@@ -140,6 +147,7 @@ class GUI(LayeredUpdates):
             if type != "Shipyard": return False
         return self.sel_unit
 
+
     def can_build_factory(self):
         """
         Checks whether the startflag is selected.
@@ -151,23 +159,26 @@ class GUI(LayeredUpdates):
             type = self.sel_unit.type
             if type != "StartFlag": return False
         return self.sel_unit
+
         
     def check_resources(self):
         """
         Makes sure players can't use negative resources.
         """
+        # Checking resources for green team
         if self.cur_team == 0:
-
+            # If tank is selected than it shouldn't use negative resources 
             if self.current_button == "Tank":
-                if self.gteam_gold - unit.tank.Tank.price()[0] < 0:
+                if self.gteam_gold - unit.tank.Tank.price()[0] < 0: 
                     return False
-                elif self.gteam_wood - unit.tank.Tank.price()[1] < 0:
+                elif self.gteam_wood - unit.tank.Tank.price()[1] < 0: 
                     return False
-                elif self.gteam_food - unit.tank.Tank.price()[2] < 0:
+                elif self.gteam_food - unit.tank.Tank.price()[2] < 0: 
                     return False
                 else:
                     return True
 
+            # If anti-air is selected than it shouldn't use negative resources 
             elif self.current_button == "Anti-Air":
                 if self.gteam_gold - unit.anti_air.AntiAir.price()[0] < 0:
                     return False
@@ -178,6 +189,7 @@ class GUI(LayeredUpdates):
                 else:
                     return True
 
+            # If jeep is selected than it shouldn't use negative resources 
             elif self.current_button == "Jeep":
                 if self.gteam_gold - unit.jeep.Jeep.price()[0] < 0:
                     return False
@@ -188,6 +200,7 @@ class GUI(LayeredUpdates):
                 else:
                     return True
 
+            # If anti-armour is selected than it shouldn't use negative resources 
             elif self.current_button == "Anti-Armour":
                 if self.gteam_gold - unit.anti_armour.AntiArmour.price()[0] < 0:
                     return False
@@ -198,6 +211,7 @@ class GUI(LayeredUpdates):
                 else:
                     return True
 
+            # If artillery is selected than it shouldn't use negative resources 
             elif self.current_button == "Artillery":
                 if self.gteam_gold - unit.artillery.Artillery.price()[0] < 0:
                     return False
@@ -208,6 +222,7 @@ class GUI(LayeredUpdates):
                 else:
                     return True
 
+            # If bomber is selected than it shouldn't use negative resources 
             elif self.current_button == "Bomber":
                 if self.gteam_gold - unit.bomber.Bomber.price()[0] < 0:
                     return False
@@ -218,6 +233,7 @@ class GUI(LayeredUpdates):
                 else:
                     return True
 
+            # If fighter is selected than it shouldn't use negative resources 
             elif self.current_button == "Fighter":
                 if self.gteam_gold - unit.fighter.Fighter.price()[0] < 0:
                     return False
@@ -228,6 +244,7 @@ class GUI(LayeredUpdates):
                 else:
                     return True
 
+            # If carrier is selected than it shouldn't use negative resources 
             elif self.current_button == "Carrier":
                 if self.gteam_gold - unit.carrier.Carrier.price()[0] < 0:
                     return False
@@ -238,6 +255,7 @@ class GUI(LayeredUpdates):
                 else:
                     return True
 
+            # If battleship is selected than it shouldn't use negative resources 
             elif self.current_button == "Battleship":
                 if self.gteam_gold - unit.battleship.Battleship.price()[0] < 0:
                     return False
@@ -248,6 +266,7 @@ class GUI(LayeredUpdates):
                 else:
                     return True
 
+            # If shipyard is selected than it shouldn't use negative resources 
             elif self.current_button == "Shipyard":
                 if self.gteam_gold - unit.shipyard.Shipyard.price()[0] < 0: 
                     return False 
@@ -258,6 +277,7 @@ class GUI(LayeredUpdates):
                 else:
                     return True
 
+            # If airstrip  is selected than it shouldn't use negative resources 
             elif self.current_button == "Airstrip":
                 if self.gteam_gold - unit.airstrip.Airstrip.price()[0] < 0: 
                     return False 
@@ -270,18 +290,20 @@ class GUI(LayeredUpdates):
             else:
                 return True
 
+        # Checking resources for red team
         elif self.cur_team == 1:
-
+            # If tank is selected than it shouldn't use negative resources 
             if self.current_button == "Tank":
-                if self.rteam_gold - unit.tank.Tank.price()[0] < 0:
+                if self.rteam_gold - unit.tank.Tank.price()[0] < 0: 
                     return False
-                elif self.rteam_wood - unit.tank.Tank.price()[1] < 0:
+                elif self.rteam_wood - unit.tank.Tank.price()[1] < 0: 
                     return False
-                elif self.rteam_food - unit.tank.Tank.price()[2] < 0:
+                elif self.rteam_food - unit.tank.Tank.price()[2] < 0: 
                     return False
                 else:
                     return True
 
+            # If anti-air is selected than it shouldn't use negative resources 
             elif self.current_button == "Anti-Air":
                 if self.rteam_gold - unit.anti_air.AntiAir.price()[0] < 0:
                     return False
@@ -292,6 +314,7 @@ class GUI(LayeredUpdates):
                 else:
                     return True
 
+            # If jeep is selected than it shouldn't use negative resources 
             elif self.current_button == "Jeep":
                 if self.rteam_gold - unit.jeep.Jeep.price()[0] < 0:
                     return False
@@ -302,6 +325,7 @@ class GUI(LayeredUpdates):
                 else:
                     return True
 
+            # If anti-armour is selected than it shouldn't use negative resources 
             elif self.current_button == "Anti-Armour":
                 if self.rteam_gold - unit.anti_armour.AntiArmour.price()[0] < 0:
                     return False
@@ -312,6 +336,7 @@ class GUI(LayeredUpdates):
                 else:
                     return True
 
+            # If artillery is selected than it shouldn't use negative resources 
             elif self.current_button == "Artillery":
                 if self.rteam_gold - unit.artillery.Artillery.price()[0] < 0:
                     return False
@@ -322,6 +347,7 @@ class GUI(LayeredUpdates):
                 else:
                     return True
 
+            # If bomber is selected than it shouldn't use negative resources 
             elif self.current_button == "Bomber":
                 if self.rteam_gold - unit.bomber.Bomber.price()[0] < 0:
                     return False
@@ -332,6 +358,7 @@ class GUI(LayeredUpdates):
                 else:
                     return True
 
+            # If fighter is selected than it shouldn't use negative resources 
             elif self.current_button == "Fighter":
                 if self.rteam_gold - unit.fighter.Fighter.price()[0] < 0:
                     return False
@@ -342,6 +369,7 @@ class GUI(LayeredUpdates):
                 else:
                     return True
 
+            # If carrier is selected than it shouldn't use negative resources 
             elif self.current_button == "Carrier":
                 if self.rteam_gold - unit.carrier.Carrier.price()[0] < 0:
                     return False
@@ -352,6 +380,7 @@ class GUI(LayeredUpdates):
                 else:
                     return True
 
+            # If battleship is selected than it shouldn't use negative resources 
             elif self.current_button == "Battleship":
                 if self.rteam_gold - unit.battleship.Battleship.price()[0] < 0:
                     return False
@@ -362,6 +391,7 @@ class GUI(LayeredUpdates):
                 else:
                     return True
 
+            # If shipyard is selected than it shouldn't use negative resources 
             elif self.current_button == "Shipyard":
                 if self.rteam_gold - unit.shipyard.Shipyard.price()[0] < 0: 
                     return False 
@@ -372,6 +402,7 @@ class GUI(LayeredUpdates):
                 else:
                     return True
 
+            # If airstrip  is selected than it shouldn't use negative resources 
             elif self.current_button == "Airstrip":
                 if self.rteam_gold - unit.airstrip.Airstrip.price()[0] < 0: 
                     return False 
@@ -386,11 +417,14 @@ class GUI(LayeredUpdates):
         else:
             raise Exception("Where is your team?")
 
+
     def renew_resources(self, unit_name):
         """
         Updates resources if unit is deleted.
-        Gives back half of original price.
+        Gives back (the floor of) half of the original price.
+        price() is a len(3) tuple unique to every unit. 
         """
+        # Green team
         if self.cur_team == 0:
 
             if unit_name == "Tank":
@@ -448,6 +482,7 @@ class GUI(LayeredUpdates):
                 self.gteam_wood += unit.airstrip.Airstrip.price()[1] // 2
                 self.gteam_food += unit.airstrip.Airstrip.price()[2] // 2
                 
+        # Red team
         elif self.cur_team == 1:
 
             if unit_name == "Tank":
@@ -505,6 +540,7 @@ class GUI(LayeredUpdates):
                 self.rteam_wood += unit.airstrip.Airstrip.price()[1] // 2
                 self.rteam_food += unit.airstrip.Airstrip.price()[2] // 2
 
+
     def move_pressed(self):
         """
         This is called when the move button is pressed.
@@ -549,6 +585,7 @@ class GUI(LayeredUpdates):
         
         # Set the current GUI mode
         self.change_mode(Modes.ChooseMove)
+
             
     def attack_pressed(self):
         """
@@ -590,6 +627,7 @@ class GUI(LayeredUpdates):
         
         # Set the current GUI mode
         self.change_mode(Modes.ChooseAttack)
+
         
     def end_turn_pressed(self):
         """
@@ -624,7 +662,6 @@ class GUI(LayeredUpdates):
         # advance turn
         self.current_turn += 1
         
-        #Send end turn code
 
     def build_pressed(self):
         """
@@ -635,9 +672,9 @@ class GUI(LayeredUpdates):
             self.change_mode(Modes.Select)
             return
 
-        # Make sure players can't go into the overdraft
+        # Make sure players can't go into the overdraft (negative resources)
         if self.check_resources() == False:
-            # Deselect to choose what you want to do next
+            # Deselect and clear build radius
             self.change_mode(Modes.Select)
             self.sel_unit = None
             return
@@ -695,7 +732,8 @@ class GUI(LayeredUpdates):
     def build_unit(self, pos):
         """
         Handles pressing one of the unit buttons.
-        Builds selected unit by your team's base.
+        Builds selected unit by your team's base,
+        within the build radius.
         """
         
         # Make sure players can't go into the overdraft
@@ -715,7 +753,8 @@ class GUI(LayeredUpdates):
             unit_x, unit_y = pos[0], pos[1]
         else:
             raise Exception("Not able to build")
-            
+        
+        # Set unit_name to desired unit to build
         if self.current_button == "Tank":
             unit_name = "Tank"
         elif self.current_button == "Anti-Air":
@@ -744,6 +783,7 @@ class GUI(LayeredUpdates):
         else:
             raise Exception("Either team or unit is wrong team {} unit {}".format(self.cur_team, self.current_button))
 
+        # Make sure unit is a buildable unit and initialize the variable with correct information
         if not unit_name in unit.unit_types:
             raise Exception("No unit of name {} found!".format(unit_name))
         new_unit = unit.unit_types[unit_name](team = unit_team,
@@ -751,6 +791,7 @@ class GUI(LayeredUpdates):
                                               tile_y = unit_y,
                                               activate = True,
                                               angle = unit_angle)
+
         # Add the unit to the update group and set its display rect
         self.update_unit_rect(new_unit)
         new_unit._update_image()
@@ -805,15 +846,15 @@ class GUI(LayeredUpdates):
                                       screen_rect.h)
         self.bg_color = bg_color
         self.map = None
-        self.newturn = 0
+        self.newturn = 0 # used in communicating with arduino
 
         # Set up team information
         self.num_teams = 2
         self.current_turn = 0
         self.win_team = None 
-        self.gteam_gold = 20 # 5
-        self.gteam_wood = 30 # 10
-        self.gteam_food = 20 # 10
+        self.gteam_gold = 20
+        self.gteam_wood = 30
+        self.gteam_food = 20
         self.rteam_gold = 20
         self.rteam_wood = 30
         self.rteam_food = 20
@@ -823,7 +864,7 @@ class GUI(LayeredUpdates):
         self.check_base = 0
         self.current_button = None
 
-        # Set up GUI
+        # Set up GUI buttons
         self.buttons = [
             Button(0, "MOVE", self.move_pressed, self.can_move, None),
             Button(1, "ATTACK", self.attack_pressed, self.can_attack, None),
@@ -866,12 +907,14 @@ class GUI(LayeredUpdates):
         """
         return (self.current_turn) % self.num_teams
     
+
     @property
     def cur_day(self):
         """
         Gets the current day based on the turn.
         """
         return (self.current_turn) // self.num_teams + 1
+
         
     def change_mode(self, new_mode):
         """
@@ -898,6 +941,7 @@ class GUI(LayeredUpdates):
             self.map.remove_highlight("build")
 
         self.mode = new_mode
+
         
     def load_level(self, filename):
         """
@@ -1002,6 +1046,7 @@ class GUI(LayeredUpdates):
             line = map_file.readline()
             if line == "":
                 raise Exception ("Expected end of unit definitions")
+
         
     def begin_turn(self):
         """
@@ -1021,6 +1066,7 @@ class GUI(LayeredUpdates):
 
         # Change to next mode
         self.change_mode(Modes.Select)
+
 
     def which_button(self, button):
         """
@@ -1115,6 +1161,7 @@ class GUI(LayeredUpdates):
 
             # Otherwise, the user is interacting with the GUI panel
             # Make sure you aren't clicking outside button area
+
             # Handles the unit building buttons
             elif e.pos[0] < UNITS_BARW and e.pos[1] > 160 and e.pos[1] <= 600:
                 count = 0
@@ -1130,6 +1177,7 @@ class GUI(LayeredUpdates):
                             # Play sound button
                             SoundManager.play(BUTTON_SOUND)
                     count += 1
+
             # Handles turn buttons
             else:
                 # Check which button was pressed
@@ -1201,6 +1249,7 @@ class GUI(LayeredUpdates):
                     self.change_mode(Modes.Select)
                     self.sel_unit = None
             
+
     def sel_unit_attack(self, pos):
         """
         Attack the given position using the selected unit.
@@ -1259,6 +1308,7 @@ class GUI(LayeredUpdates):
             self.win_team = self.sel_unit.team
             self.mode = Modes.GameOver
     
+
     def sel_unit_move(self, pos):
         """
         Move the selected unit to the given position.
@@ -1290,6 +1340,7 @@ class GUI(LayeredUpdates):
                 cost,
                 passable))
                 
+
     def get_unit_at_screen_pos(self, pos):
         """
         Gets the unit at a specified screen position ((x,y) tuple).
@@ -1299,6 +1350,7 @@ class GUI(LayeredUpdates):
         tile_pos = self.map.tile_coords(pos)
         return unit.base_unit.BaseUnit.get_unit_at_pos(tile_pos)
         
+
     def update_unit_rect(self, unit):
         """
         Scales a unit's display rectangle to screen coordiantes.
@@ -1308,6 +1360,7 @@ class GUI(LayeredUpdates):
         unit.rect.x = screen_x
         unit.rect.y = screen_y
         
+
     def update(self):
         """
         Update everything in the group.
@@ -1332,6 +1385,7 @@ class GUI(LayeredUpdates):
         
         # Update effects
         self._effects.update()
+
 
     def draw(self):
         """
@@ -1391,11 +1445,13 @@ class GUI(LayeredUpdates):
         # Update the screen
         pygame.display.flip()
         
+
     def draw_reticle(self, pos):
         """
         Draws a reticle with its top-left corner at pos.
         """
         self.screen.blit(self._reticle.image, pos)
+
 
     def draw_bar(self):
         """
@@ -1625,6 +1681,7 @@ class GUI(LayeredUpdates):
         for button in range(3):
             self.draw_bar_button(self.buttons[button])
 
+
     def draw_bar_text(self, text, line_num):
         """
         Draws text with a specified variable at a specifed line number.
@@ -1633,6 +1690,7 @@ class GUI(LayeredUpdates):
         self.screen.blit(
             line_text,
             (self.bar_rect.x + PAD, FONT_SIZE * line_num + PAD))
+
 
     def draw_bar_title(self, text, line_num):
         """
@@ -1643,6 +1701,7 @@ class GUI(LayeredUpdates):
             title_text,
             (self.bar_rect.centerx - (title_text.get_width()/2),
             FONT_SIZE * line_num + PAD))
+
 
     def draw_bar_div_line(self, line_num):
         """
@@ -1655,6 +1714,7 @@ class GUI(LayeredUpdates):
             (self.bar_rect.x, y),
             (self.bar_rect.right, y))
             
+
     def get_button_rect(self, button):
         """
         Gets the rectangle bounding a button in screen cordinates.
@@ -1665,6 +1725,7 @@ class GUI(LayeredUpdates):
                             y,
                             self.bar_rect.width,
                             BUTTON_HEIGHT)
+
 
     def draw_bar_button(self, button):
         """
@@ -1777,7 +1838,8 @@ class GUI(LayeredUpdates):
                         self.draw_units_bar_text("Food: {}".format(button[4][2]), line_num)
                         line_num += 1
 
-    def draw_units_bar_text(self, text, line_num):
+ 
+   def draw_units_bar_text(self, text, line_num):
         """
         Draws text with a specified variable at a specifed line number.
         """
@@ -1785,6 +1847,7 @@ class GUI(LayeredUpdates):
         self.screen.blit(
             line_text,
             (self.units_bar_rect.x + PAD, FONT_SIZE * line_num + PAD))
+
 
     def draw_units_bar_title(self, text, line_num):
         """
@@ -1796,6 +1859,7 @@ class GUI(LayeredUpdates):
             (self.units_bar_rect.centerx - (title_text.get_width()/2),
             FONT_SIZE * line_num + PAD))
 
+
     def draw_units_bar_div_line(self, line_num):
         """
         Draws a dividing line at a specified line number.
@@ -1806,6 +1870,7 @@ class GUI(LayeredUpdates):
             (50, 50, 50),
             (self.units_bar_rect.x, y),
             (self.units_bar_rect.right, y))
+
 
     def draw_units_button(self, button):
         """
@@ -1856,15 +1921,21 @@ class GUI(LayeredUpdates):
                             y,
                             self.units_bar_rect.width,
                             UNIT_BUTTON_HEIGHT)
+
     def signal(self):
         """
         Used for coordinating with arduino
         """
         self.newturn = 0
 
+
     def update_resources(self, serial_in):
         """
-        Recieves resource info from arduino
+        Recieves resource info from arduino in the 
+        form of a string with three numbers in it.
+        Decodes it if neccessary and then adds
+        the correct number to corresponding field
+        for the correct team.
         """
         raw_data = serial_in.readline()
         
@@ -1875,11 +1946,14 @@ class GUI(LayeredUpdates):
             data = raw_data
 
         data = data.split()
-
+        
+        # Green team
         if self.cur_team == 0:
             self.gteam_gold += int(data[0])
             self.gteam_wood += int(data[1])
             self.gteam_food += int(data[2])
+
+        # Red team
         elif self.cur_team == 1:
             self.rteam_gold += int(data[0])
             self.rteam_wood += int(data[1])

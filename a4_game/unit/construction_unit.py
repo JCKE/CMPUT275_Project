@@ -9,6 +9,7 @@ class ConstructionUnit(BaseUnit):
     
     - Only collides with other ground units
     - Gains bonuses (and debuffs) from tiles.
+    - Can't move or attack but can be attacked
     """
     def __init__(self, **keywords):
         #load the base class
@@ -22,7 +23,7 @@ class ConstructionUnit(BaseUnit):
         """
         Determines whether a unit can hit another unit.
         """
-        # If it's an air unit return false
+        # If it's an air unit return True
         if isinstance(target_unit, unit.air_unit.AirUnit):
             return True
             

@@ -40,7 +40,6 @@ class BaseUnit(Sprite):
         self._active = False
         self._path = []
         self.turn_state = [False, False]
-        self.price = 5
         self.day = 0 # added to easily keep track of the number of days that've gone by.
         
         #Default unit stats
@@ -167,7 +166,6 @@ class BaseUnit(Sprite):
 
         # Render the health.
         health_surf = BaseUnit.health_font.render(str(int(self.health)))
-      #  print((int(self.health), self.type, self.tile_x)) #<><><><><><><><><><><><><><><><><><><><>
         
         # Move the health to the bottom-right of the image.
         image_rect = self.image.get_rect()
