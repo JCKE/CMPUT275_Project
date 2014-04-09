@@ -637,6 +637,9 @@ class GUI(LayeredUpdates):
 
         # Make sure players can't go into the overdraft
         if self.check_resources() == False:
+            # Deselect to choose what you want to do next
+            self.change_mode(Modes.Select)
+            self.sel_unit = None
             return
 
         # If there is no unit selected, nothing happens.
@@ -697,6 +700,9 @@ class GUI(LayeredUpdates):
         
         # Make sure players can't go into the overdraft
         if self.check_resources() == False:
+            # Deselect to choose what you want to do next
+            self.change_mode(Modes.Select)
+            self.sel_unit = None
             return
 
         # Create the units
