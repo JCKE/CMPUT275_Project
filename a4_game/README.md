@@ -26,7 +26,7 @@ To run the game, do
     or
     python3 main.py -m <map> -s <serial_port>
 
-where <map> is the name of one of the maps in the maps directory (minus 
+where _map_ is the name of one of the maps in the maps directory (minus 
 the ".lvl" extension).
 
 Gameplay
