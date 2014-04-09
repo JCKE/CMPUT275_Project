@@ -694,6 +694,10 @@ class GUI(LayeredUpdates):
         Handles pressing one of the unit buttons.
         Builds selected unit by your team's base.
         """
+        
+        # Make sure players can't go into the overdraft
+        if self.check_resources() == False:
+            return
 
         # Create the units
 
@@ -801,12 +805,12 @@ class GUI(LayeredUpdates):
         self.num_teams = 2
         self.current_turn = 0
         self.win_team = None 
-        self.gteam_gold = 5
-        self.gteam_wood = 10
-        self.gteam_food = 5
-        self.rteam_gold = 5
-        self.rteam_wood = 10
-        self.rteam_food = 5
+        self.gteam_gold = 20 # 5
+        self.gteam_wood = 30 # 10
+        self.gteam_food = 20 # 10
+        self.rteam_gold = 20
+        self.rteam_wood = 30
+        self.rteam_food = 20
 
         # The currently selected unit
         self.sel_unit = None
