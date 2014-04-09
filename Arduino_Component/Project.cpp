@@ -756,7 +756,6 @@ void transfer_resources(hashtable *ht, player *sel_player)
 	      update_unit_resources(sel_unit->resource_type, 0, sel_unit, sel_player);
 	      draw_tile(ht, sel_unit->x_pos, sel_unit->y_pos);
 	      //draw_unit(sel_unit->x_pos, sel_unit->y_pos, sel_unit->sprite, 'F', sel_unit);
-	      change_turns(ht);
 	    }
 	}
     }
@@ -896,7 +895,7 @@ void draw_base_corner(char team)
 
 void change_turns(hashtable *ht, player *sel_player)
 {
-  /*Serial.read(); // Gets rid of any stuff in the inbox
+  Serial.read(); // Gets rid of any stuff in the inbox
 
   int a[] = { sel_player->gold, sel_player->wood, sel_player->food };
 
@@ -905,7 +904,7 @@ void change_turns(hashtable *ht, player *sel_player)
       Serial.print(a[i]);
       Serial.print(" ");
     }
-    Serial.print('\n');*/
+    Serial.print('\n');
 
   sel_player->gold = 0;
   sel_player->wood = 0;
