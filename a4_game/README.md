@@ -15,11 +15,18 @@ This engine is built in Python 3 using Pygame. To install Pygame for Python 3
 (assuming you're using Ubuntu), see these instructions:
 http://www.pygame.org/wiki/CompileUbuntu
 
+To use the Ardunio side of the game PySerial is required to be installed.
+Documentation at: http://pyserial.sourceforge.net/
+
 To run the game, do
 
-    python3 main.py <mapname>
+    python3 main.py -s <serial_port>
+    or
+    python3 main.py -d # to debug
+    or
+    python3 main.py -m <map> -s <serial_port>
 
-where _mapname_ is the name of one of the maps in the maps directory (minus 
+where <map> is the name of one of the maps in the maps directory (minus 
 the ".lvl" extension).
 
 Gameplay
@@ -115,7 +122,8 @@ The buttons will be activated only when the approperiate base is selected. At th
 turn you are required to select the start flag of your team color and click the highlighted
 factory button. Once you have done so, a yellow highlighted radius will appear around your
 flag. These squares represent where you can build your base, the yellow radi apply to all
-three base types. Left clicking the highlighted buttons will allow you to build.
+three base types when you want to build a unit. Left clicking the highlighted buttons after a 
+certain base is selected will allow you to build provided you have resources.
 The bases are:
 - Factory: main base where you can build ground units and other bases from it. No cost.
 - Airstrip: allows you to build and refuel air units. Not free to build.
