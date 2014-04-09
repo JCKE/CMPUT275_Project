@@ -801,12 +801,12 @@ class GUI(LayeredUpdates):
         self.num_teams = 2
         self.current_turn = 0
         self.win_team = None 
-        self.gteam_gold = 50
+        self.gteam_gold = 40
         self.gteam_wood = 50
-        self.gteam_food = 80
-        self.rteam_gold = 50
+        self.gteam_food = 75
+        self.rteam_gold = 40
         self.rteam_wood = 50
-        self.rteam_food = 80
+        self.rteam_food = 75
 
         # The currently selected unit
         self.sel_unit = None
@@ -1865,7 +1865,7 @@ class GUI(LayeredUpdates):
             data = raw_data
 
         data = data.split()
-        print(data)
+
         if self.cur_team == 0:
             self.gteam_gold += int(data[0])
             self.gteam_wood += int(data[1])

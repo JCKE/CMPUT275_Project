@@ -41,7 +41,6 @@ class AntiArmour(GroundUnit):
         self.bonus_damage = 4
         self.defense = 0
         self.hit_effect = effects.Explosion
-        self.price = 20
         self._move_costs = {'mountain': 2,
                              'forest': 1.5,
                              'sand': 1.5}
@@ -83,6 +82,6 @@ class AntiArmour(GroundUnit):
         else:
             return super().get_damage(target, target_tile)
 
-    def price(): return (50, 50, 25)
+    def price(): return (7, 5, 20)
         
 unit.unit_types["Anti-Armour"] = AntiArmour

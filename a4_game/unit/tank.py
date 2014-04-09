@@ -69,6 +69,6 @@ class Tank(GroundUnit):
         # Not an air unit, return true
         return True
 
-    def price(): return (75, 75, 75)
+    def price(): return (10, 30, 10)
 
 unit.unit_types["Tank"] = Tank

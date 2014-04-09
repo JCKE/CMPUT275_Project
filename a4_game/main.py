@@ -8,8 +8,9 @@ RESOLUTION = pygame.Rect(0, 0, 915, 600)
 BG_COLOR = (32, 32, 32)
 
 # To run:
-# $ python main.py -s /dev/ttyACM0
-# or $ python main.py -m <desired map> -s <serial-port>
+# $ python3 main.py -s /dev/ttyACM0
+# or $ python3 main.py -m <desired map> -s <serial-port>
+# Working from stdin/stdout not recommended
 
 def main():
 

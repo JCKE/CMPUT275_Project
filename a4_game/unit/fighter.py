@@ -11,7 +11,7 @@ class Fighter(AirUnit):
     Armour: High
     Speed: Very High
     Range: Medium
-    Damage: Medium
+    Damage: High
     Fuel: Low
     
     Other notes:
@@ -36,7 +36,7 @@ class Fighter(AirUnit):
         self.type = "Fighter"
         self.speed = 16
         self.max_atk_range = 4
-        self.damage = 5
+        self.damage = 6
         self.defense = 3
         self.bonus_damage = 2
         self.max_fuel = 7
@@ -66,6 +66,6 @@ class Fighter(AirUnit):
             return damage - defense
         else: return super().get_damage(target, target_tile)
 
-    def price(): return (50, 75, 25)
+    def price(): return (25, 50, 5)
     
 unit.unit_types["Fighter"] = Fighter

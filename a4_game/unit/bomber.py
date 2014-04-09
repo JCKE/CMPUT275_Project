@@ -12,7 +12,7 @@ class Bomber(AirUnit):
     Armour: High
     Speed: High
     Range: Very Low
-    Damage: Medium
+    Damage: High
     Fuel: Medium
     
     Other notes:
@@ -38,7 +38,7 @@ class Bomber(AirUnit):
         self.type = "Bomber"
         self.speed = 10
         self.max_atk_range = 1
-        self.damage = 4
+        self.damage = 6
         self.defense = 4
         self.bonus_land_damage = 4
         self.bonus_water_damage = 3
@@ -113,6 +113,6 @@ class Bomber(AirUnit):
         # Not an air unit, return true
         return True
 
-    def price(): return (50, 80, 25)
+    def price(): return (25, 50, 5)
     
 unit.unit_types["Bomber"] = Bomber

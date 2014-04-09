@@ -41,7 +41,6 @@ class Artillery(GroundUnit):
         self.damage = 7
         self.defense = 1
         self.hit_effect = effects.Explosion
-        self.price = 20
         self._move_costs = {'plains': 1.5,
                              'sand': 1.5,
                              'road': 1,
@@ -94,6 +93,6 @@ class Artillery(GroundUnit):
             return True
         return False
 
-    def price(): return (50, 50, 50)
+    def price(): return (7, 15, 15)
 
 unit.unit_types["Artillery"] = Artillery

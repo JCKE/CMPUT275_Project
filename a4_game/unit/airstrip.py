@@ -33,6 +33,6 @@ class Airstrip(ConstructionUnit):
         self.defense = 2
         self.hit_effect = effects.Explosion
 
-    def price(): return (200, 200, 200)
+    def price(): return (75, 75, 75)
 
 unit.unit_types["Airstrip"] = Airstrip
