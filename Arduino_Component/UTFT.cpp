@@ -1111,7 +1111,7 @@ uint8_t UTFT::getFontYsize()
 	return cfont.y_size;
 }
 
-void UTFT::drawBitmap(int x, int y, int sx, int sy, bitmapdatatype data, int scale)
+void UTFT::drawBitmap(int x, int y, int sx, int sy, bitmapdatatype data, int scale, long trans_color, long shadow_color)
 {
 	unsigned int col;
 	int tx, ty, tc, tsx, tsy;
@@ -1132,15 +1132,57 @@ void UTFT::drawBitmap(int x, int y, int sx, int sy, bitmapdatatype data, int sca
 		else
 		{
 			cbi(P_CS, B_CS);
+			
 			for (ty=0; ty<sy; ty++)
-			{
-				setXY(x, y+ty, x+sx-1, y+ty);
+			  {
+			    if(trans_color != -2)
+			      {
+				tsx = 0;
 				for (tx=sx-1; tx>=0; tx--)
-				{
-					col=pgm_read_word(&data[(ty*sx)+tx]);
-					LCD_Write_DATA(col>>8,col & 0xff);
-				}
-			}
+				  {
+				    col=pgm_read_word(&data[(ty*sx)+tx]);
+
+				    if(col != trans_color && tsx == 0)
+				      tsx = tx;
+				    if(col == trans_color && tsx != 0)
+				      {
+					tsy = tx+1;
+					break;
+				      }
+				    if(tx == 0)
+				      {
+					tsy = 0;
+					if(tsx == 0)
+					  tsx = sx-1;
+				      }
+				  
+				  }
+			      }
+			    else
+			      {
+				tsy = 0;
+				tsx = sx-1;
+			      }
+			    //setXY(x, y+ty, x+sx-1, y+ty);
+			    if(trans_color != -2)
+			      {
+				tsx ++;
+				tsy --;
+				setXY(x - 1, y+ty, x + tsx, y+ty);
+			      }
+			    else
+			      setXY(x, y+ty, x + tsx, y+ty);
+
+			    for (tx=tsx; tx>=tsy; tx--)
+			      {
+				if(trans_color != -2 && (tx == tsx || tx == tsy))
+				  col=shadow_color;
+				else
+				  col=pgm_read_word(&data[(ty*sx)+tx]);
+			      
+				LCD_Write_DATA(col>>8,col & 0xff);
+			      }
+			  }
 			sbi(P_CS, B_CS);
 		}
 	}

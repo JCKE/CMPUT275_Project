@@ -52,21 +52,24 @@ def unpack_image(filename):
 
 def main():
     file_data = {} # dictionary where k, v = color, (x, y)coor
+    pixels_x = {}
+    pixels_y = {}
     
-    print('\nEnter a .pbm image (without the .pbm):')
-    image_file = sys.stdin.readline().rstrip('\n') 
-
+    print('\nEnter .pbm files (without the .pbm):')
+    image_files = sys.stdin.readline().rstrip('\n').split()
+    
     print('\nEnter .c file to write to (without the .c):')
-    write_file = sys.stdin.readline().rstrip('\n') 
+    write_file = sys.stdin.readline().rstrip('\n')
 
     print('\nEnter a .h file to write to, or skip.\n(must have //<><>UNITS<><> to write properly)')
     dot_h = sys.stdin.readline().rstrip('\n')
     print('Processing...')
-            
-    file_data, pixels_x, pixels_y = unpack_image(image_file)
-    print_to_dot_c(image_file, write_file, file_data, pixels_x, pixels_y, dot_h)
+
+    for image_file in image_files:
+        file_data[image_file], pixels_x[image_file], pixels_y[image_file] = unpack_image(image_file)
+    print_to_dot_c(image_files, write_file, file_data, pixels_x, pixels_y, dot_h)
     
-def print_to_dot_c(image_name, write_file, file_info, pixel_x, pixel_y, dot_h):
+def print_to_dot_c(image_names, write_file, file_info, pixel_x, pixel_y, dot_h):
     """
     Prints EVERYTHING into a .h file for reading of Arduino.
     """
@@ -76,35 +79,40 @@ def print_to_dot_c(image_name, write_file, file_info, pixel_x, pixel_y, dot_h):
         dot_h_file.close()
         os.remove(dot_h + '.h')
     
-        dot_h_file = open(dot_h + '.h', 'w') # make map.h to write to now
+        dot_h_file = open(dot_h + '.h', 'w') # make dot.h to write to now
         while info_buffer:
-            dot_h_file.write(info_buffer[0] + '\n')
-            if info_buffer[0][:15] == '//<><>UNITS<><>':
-                dot_h_file.write('extern prog_uint16_t {}[{}]; // {}x{}\n'.format(image_name, pixel_x*pixel_y, pixel_x, pixel_y))
+            dot_h_file.write(info_buffer[0])
+            if len(info_buffer) > 1:
+                dot_h_file.write('\n');
+            if info_buffer[0].replace(" ", "") == '//<><>UNITS<><>':
+                for image_file in image_names:
+                    dot_h_file.write('extern prog_uint16_t {}[{}]; // {}x{}\n'.format(image_file, pixel_x[image_file]*pixel_y[image_file], pixel_x[image_file], pixel_y[image_file]))
             
             info_buffer.remove(info_buffer[0])
         
         dot_h_file.close()
     
     dot_c_file = open(write_file + '.c', 'a') # create and open a .c file for writing.
-    
-    dot_c_file.write('#include <avr/pgmspace.h>\n\nprog_uint16_t {}[{}] PROGMEM='.format(image_name, pixel_x*pixel_y) + '{\n')
-        
-    for pixel in range(pixel_x*pixel_y):
-        
-        dot_c_file.write("{}".format(file_info[(pixel%pixel_x, pixel//pixel_x)]))
-        
-        if file_info[(pixel%pixel_x, pixel//pixel_x)] == '0x0':
-            dot_c_file.write("000") # add some extra zeros to make it looke nice
-        
-        if pixel != (pixel_x*pixel_y)-1:
-            if pixel%16 == 15:
-                dot_c_file.write(',\n')
-            else:
-                dot_c_file.write(', ')
-        else:
-            dot_c_file.write('};\n\n')
 
+    dot_c_file.write('#include <avr/pgmspace.h>\n\n')
+    for image_file in image_names:
+        dot_c_file.write('prog_uint16_t {}[{}] PROGMEM='.format(image_file, pixel_x[image_file]*pixel_y[image_file]) + '{\n')
+        
+        for pixel in range(pixel_x[image_file]*pixel_y[image_file]):
+        
+            dot_c_file.write("{}".format(file_info[image_file][(pixel%pixel_x[image_file], pixel//pixel_x[image_file])]))
+        
+            if file_info[image_file][(pixel%pixel_x[image_file], pixel//pixel_x[image_file])] == '0x0':
+                dot_c_file.write("000") # add some extra zeros to make it looke nice
+
+            if pixel != (pixel_x[image_file]*pixel_y[image_file])-1:
+                if pixel%16 == 15:
+                    dot_c_file.write(',\n')
+                else:
+                    dot_c_file.write(', ')
+            else:
+                dot_c_file.write('};\n\n')
+        
     dot_c_file.close()
     print("Success!")
 

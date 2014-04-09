@@ -1,6 +1,7 @@
 #include "tile.h"
 #include "project.h"
 
+
 void setup()
 {
   Serial.begin(9600);
@@ -8,25 +9,37 @@ void setup()
   randomSeed(analogRead(7));
   pinMode(SEL,INPUT);
   digitalWrite(SEL,HIGH);
+  pinMode(SEL_2,INPUT);
+  digitalWrite(SEL_2,HIGH);
+  pinMode(SEL_3,INPUT);
+  digitalWrite(SEL_3,HIGH);
+  pinMode(SEL_4,INPUT);
+  digitalWrite(SEL_4,HIGH);
+
   JoyCenterY = analogRead(VERT);
   JoyCenterX = analogRead(HORIZ);
+  JoyCenterY_2 = analogRead(VERT_2);
+  JoyCenterX_2 = analogRead(HORIZ_2);
   
+  current_JoyCenterX = JoyCenterX;
+  current_JoyCenterY = JoyCenterY;
+
   tile_data = ht_new(tile_height);
   initialize_LCD();
   load_map(tile_data);
-
-  Serial.print("MEMORY AVAILABLE: ");
-  Serial.println(AVAIL_MEM);
 }
 
 void loop()
 {
+
+  if(Serial.available() > 0)
+      change_turns(tile_data);
+
   Move_Cursor(tile_data);
   check_button_press(tile_data);
   move_units(tile_data);
   gather_resources(tile_data);
   transfer_resources(tile_data);
-  delay(150);
 }
 
 void assign_names()
@@ -35,7 +48,7 @@ void assign_names()
   for(int i = 0; i < 20; i++)
     strcpy(temp_names[i], unit_names[i]);
 
-  for(int i = 0; i < 1000; i++)
+  for(int i = 0; i < 600; i++)
     {
       int swap_pos_1 = random(20);
       int swap_pos_2 = random(20);
@@ -79,9 +92,9 @@ void assign_names()
 
 void draw_tile(hashtable *ht, byte x_pos, byte y_pos)
 { 
-  if(x_pos == 3 && y_pos == 13)
+  if(x_pos == green.gate_x && y_pos == green.gate_y)
     draw_base_corner('G');
-  else if(x_pos == 16 && y_pos == 13)
+  else if(x_pos == red.gate_x && y_pos == red.gate_y)
     draw_base_corner('R');
   else
     {
@@ -112,6 +125,31 @@ void draw_tile(hashtable *ht, byte x_pos, byte y_pos)
 	  myGLCD3.drawBitmap(x_pos*tile_x_size, (y_pos- tile_height/2)*tile_y_size, tile_x_size, tile_y_size, Sel_Tile);
 	else if(x_pos >= tile_width/2 && y_pos >= tile_height/2)
 	  myGLCD4.drawBitmap((x_pos - tile_width/2)*tile_x_size, (y_pos- tile_height/2)*tile_y_size, tile_x_size, tile_y_size, Sel_Tile);
+    }
+
+  if(x_pos == CursorX && y_pos == CursorY)
+    draw_cursor(x_pos, y_pos);
+
+  for(int u = 0; u < 20; u++)
+    {
+      unit *sel_unit; 
+      player *sel_player;
+      if(u<10)
+	{
+	  sel_unit = &green.units[u];
+	  sel_player = &green;
+	}
+      else
+	{
+	  sel_unit = &red.units[(u-10)];
+	  sel_player = &red;
+	}
+		
+      if(sel_unit->active == true && x_pos == sel_unit->x_pos && y_pos == sel_unit->y_pos)
+	if(sel_unit->gathering == true)
+	  draw_unit(ht, sel_unit->x_pos, sel_unit->y_pos, sel_unit->sprite, 'B', sel_unit, sel_player->team);
+	else
+	  draw_unit(ht, sel_unit->x_pos, sel_unit->y_pos, sel_unit->sprite, 'F', sel_unit, sel_player->team);
     }
 }
 
@@ -193,7 +231,6 @@ void initialize_LCD()
   myGLCD4.setBackColor(VGA_TRANSPARENT);
 }
 
-
 int signof(int number){
   if(number < 0)
     return -1;
@@ -216,26 +253,32 @@ void load_map(hashtable *ht)
 
   draw_bases();
 
-  update_assets('A', 0, 'P', &red);
-  update_assets('A', 0, 'P', &green);
+  print_assets('R', 0, 'P', &red);
+  print_assets('R', 0, 'P', &green);
   draw_cursor(CursorX, CursorY);
   tile *t = tile_lookup(ht, CursorX, CursorY);
   update_cursor_assets(t->resource_type_1, t->resource_amount_1, t->resource_type_2, t->resource_amount_2);
 
+ 
+  for(int i = 0; i < 3; i++) 
+    {
+      Serial.print(0);
+      Serial.print(" ");
+    }
+  Serial.print('\n');
+
   assign_names();
-  for(int n = 0; n < 20; n++)
-    Serial.print(unit_names[n]);
-  Serial.println();
+
   green.units[0].active = true;
   red.units[0].active = true;
 
-  Serial.println(current_unit->name);
-
-  update_unit_info();
-  draw_unit(current_unit->x_pos, current_unit->y_pos, current_unit->sprite, 'F');
+  print_unit_info(&green.units[0], &green);
+  print_unit_info(&red.units[0], &red);
+  draw_unit(ht, green.units[0].x_pos, green.units[0].y_pos,  green.units[0].sprite, 'F', &green.units[0], green.team);
+  draw_unit(ht, red.units[0].x_pos, red.units[0].y_pos, red.units[0].sprite, 'F', &red.units[0], red.team);
 }
 
-void update_assets(char asset_type, int asset_amount, char cursor_or_player, player *sel_player)
+void print_assets(char asset_type, int asset_amount, char cursor_or_player, player *sel_player)
 {
   int x_shift = 0;
   int y_shift = 0;
@@ -246,51 +289,63 @@ void update_assets(char asset_type, int asset_amount, char cursor_or_player, pla
     x_shift -= 12;
 
   if(asset_type == 'G')
-    print_int_to_box(asset_amount, 20 + x_shift, 41 + y_shift, sel_player, gold_color);
+      print_int_to_box(asset_amount, 20 + x_shift, 41 + y_shift, sel_player, gold_color);
   else if(asset_type == 'W')
-    print_int_to_box(asset_amount, 52 + x_shift, 41 + y_shift, sel_player, wood_color);
+      print_int_to_box(asset_amount, 52 + x_shift, 41 + y_shift, sel_player, wood_color);
   else if(asset_type == 'F')
-    print_int_to_box(asset_amount, 84 + x_shift, 41 + y_shift, sel_player, food_color);
+      print_int_to_box(asset_amount, 84 + x_shift, 41 + y_shift, sel_player, food_color);
   else if(asset_type == 'U')
-    print_int_to_box(asset_amount, 94, 73, sel_player, VGA_BLACK);
-  else if(asset_type == 'A' && cursor_or_player == 'P')
+      print_int_to_box(asset_amount, 94, 73, sel_player, VGA_BLACK);
+  else if(asset_type == 'R' && cursor_or_player == 'P') // reset
     {
-      update_assets('G', sel_player->gold, cursor_or_player, sel_player);
-      update_assets('W', sel_player->wood, cursor_or_player, sel_player);
-      update_assets('F', sel_player->food, cursor_or_player, sel_player);
-      update_assets('U', sel_player->num_units, cursor_or_player, sel_player);
+      print_assets('G', sel_player->gold, cursor_or_player, sel_player);
+      print_assets('W', sel_player->wood, cursor_or_player, sel_player);
+      print_assets('F', sel_player->food, cursor_or_player, sel_player);
+      print_assets('U', sel_player->num_units, cursor_or_player, sel_player);
     }
 }
 
 void update_cursor_assets(char asset_type_1, int asset_amount_1, char asset_type_2, int asset_amount_2, player *sel_player)
 {
   if(asset_type_1 != 'G' && asset_type_2 != 'G')
-    update_assets('G', 0, 'C', sel_player);
+    print_assets('G', 0, 'C', sel_player);
   if(asset_type_1 != 'W' && asset_type_2 != 'W')
-    update_assets('W', 0, 'C', sel_player);
+    print_assets('W', 0, 'C', sel_player);
   if(asset_type_1 != 'F' && asset_type_2 != 'F')
-    update_assets('F', 0, 'C', sel_player);
+    print_assets('F', 0, 'C', sel_player);
 
-  update_assets(asset_type_1, asset_amount_1, 'C', sel_player);
-  update_assets(asset_type_2, asset_amount_2, 'C', sel_player);
+  print_assets(asset_type_1, asset_amount_1, 'C', sel_player);
+  print_assets(asset_type_2, asset_amount_2, 'C', sel_player);
 }
 
 
-
-void update_unit_info(unit *sel_unit, player *sel_player)
+void print_unit_info(unit *sel_unit, player *sel_player)
 {
   for(int space = 0; space < 6; space ++)
     print_txt_to_box(" ", 18 + (8*space), 65, sel_player, VGA_BLACK);
   print_txt_to_box(sel_unit->name, 18, 65, sel_player, VGA_BLACK);
   
-  update_unit_resources(sel_unit->resource_type, sel_unit->resource_amount, sel_unit, sel_player);
+  update_unit_resources(sel_unit->resource_type, 0, sel_unit, sel_player);
 }
+
 
 void update_unit_resources(char resource_type, int resource_amount, unit *sel_unit, player *sel_player)
 {
   sel_unit->resource_amount += resource_amount;
 
-  if(sel_unit == current_unit && sel_unit->resource_type != NULL)
+  print_unit_resources(resource_type, resource_amount, sel_unit, sel_player);
+  
+  if(resource_type == 'G')
+    sel_unit->gold += resource_amount;
+  else if(resource_type == 'W')
+    sel_unit->wood += resource_amount;
+  else if(resource_type == 'F')
+    sel_unit->food += resource_amount;
+}
+
+void print_unit_resources(char resource_type, int resource_amount, unit *sel_unit, player *sel_player)
+{
+  if(sel_unit == current_unit)
     {
       char msg[2];
       
@@ -301,40 +356,34 @@ void update_unit_resources(char resource_type, int resource_amount, unit *sel_un
       else if(resource_type == 'F')
 	strcpy(msg, "F");
       else
-	strcpy(msg, NULL);
+	strcpy(msg, " ");
 
       print_txt_to_box(msg, 18, 76, sel_player, VGA_BLACK);
 
       print_txt_to_box("   ", 30, 76, sel_player, VGA_BLACK);
-      print_int_to_box(sel_unit->resource_amount, 30, 76, sel_player, VGA_BLACK);
+      if(sel_unit->resource_amount != 0)
+	print_int_to_box(sel_unit->resource_amount, 30, 76, sel_player, VGA_BLACK);
     }  
-  
-  if(resource_type == 'G')
-    sel_unit->gold += resource_amount;
-  else if(resource_type == 'W')
-    sel_unit->wood += resource_amount;
-  else if(resource_type == 'F')
-    sel_unit->food += resource_amount;
 }
 
 void Move_Cursor(hashtable *ht)
 {
-  int JoyVert = analogRead(VERT);
-  int JoyHoriz = analogRead(HORIZ);
+  int JoyVert = analogRead(current_VERT);
+  int JoyHoriz = analogRead(current_HORIZ);
 
-  if(abs(JoyVert - JoyCenterY) > OFFSET || abs(JoyHoriz - JoyCenterX) > OFFSET)
+ if((abs(JoyVert - current_JoyCenterY) > OFFSET || abs(JoyHoriz - current_JoyCenterX) > OFFSET) && (millis() - cursor_last_move) > 100)
     {
       // Moves CursorY up or down according to JoyVert
-      if(abs(JoyVert - JoyCenterY) > OFFSET)
+      if(abs(JoyVert - current_JoyCenterY) > OFFSET)
 	{
-	  CursorY += signof(JoyVert - JoyCenterY);
+	  CursorY += signof(JoyVert - current_JoyCenterY);
 	  CursorY = constrain(CursorY, 0, tile_height - 1);
 	}
   
       // Moves CursorX left or right according to JoyHoriz
-      if(abs(JoyHoriz - JoyCenterX) > OFFSET)
+      if(abs(JoyHoriz - current_JoyCenterX) > OFFSET)
 	{
-	  CursorX += signof(JoyHoriz - JoyCenterX);
+	  CursorX += signof(JoyHoriz - current_JoyCenterX);
 	  CursorX = constrain(CursorX, 0, tile_width -1);
 	}
 
@@ -388,26 +437,13 @@ void Move_Cursor(hashtable *ht)
 	     (pt->resource_amount_1 > 0 || t->resource_amount_1 > 0 || pt->resource_amount_2 > 0 || t->resource_amount_2 > 0))
 	    update_cursor_assets(t->resource_type_1, t->resource_amount_1, t->resource_type_2, t->resource_amount_2);
 
-	  for(int u = 0; u < 20; u++)
-	    {
-	      unit *sel_unit; 
-	      if(u<10)
-		sel_unit = &green.units[u];
-	      else
-		sel_unit = &red.units[(u-10)];
-		
-	      if(sel_unit->active == true && prev_CursorX == sel_unit->x_pos && prev_CursorY == sel_unit->y_pos)
-		if(sel_unit->gathering == true)
-		  draw_unit(sel_unit->x_pos, sel_unit->y_pos, sel_unit->sprite, 'B');
-		else
-		  draw_unit(sel_unit->x_pos, sel_unit->y_pos, sel_unit->sprite, 'F');
-	    }
 
 	  // Draws new position of Cursor
 	  draw_cursor(CursorX, CursorY);
 	  prev_CursorX = CursorX;
 	  prev_CursorY = CursorY;
 	}
+      cursor_last_move = millis();
     }
 }
 
@@ -449,9 +485,59 @@ void draw_cursor(int x_pos, int y_pos)
 
 void check_button_press(hashtable *ht)
 {
-  int select = digitalRead(SEL);
+  static bool sel_pressed = false;
+  static bool sel_2_pressed = false;
+  static unsigned long last_pressed = 0; // used to fix a problem where many unit switches happen at once
+  int select = digitalRead(current_SEL);
+  int select_2 = digitalRead(current_SEL_2);
   
-  if(select == LOW)
+  if(sel_pressed == true)
+    {
+      select = digitalRead(current_SEL);
+      if(select == HIGH)
+	sel_pressed = false;
+    }
+  
+  if(sel_2_pressed == true)
+    {
+      select_2 = digitalRead(current_SEL_2);
+      if(select_2 == HIGH)
+	sel_2_pressed = false;
+    }
+  
+  if(select == LOW && select_2 == LOW && current_player->num_units < 10 && current_player->food >= 100 && sel_pressed == false && sel_2_pressed == false)
+    {
+      current_player->num_units ++;
+      for(int u = 0; u < 10; u++)
+	{
+	  unit *sel_unit = &current_player->units[u];
+	  if(sel_unit->active == true && sel_unit == current_unit)
+	    {
+	      for(int nu = 1; nu < 10; nu++)
+		{
+		  unit *next_sel_unit = &current_player->units[(u+nu)%10];
+		  if(next_sel_unit->active == false)
+		    {
+		      current_unit = next_sel_unit;
+		      //draw_unit(sel_unit->x_pos, sel_unit->y_pos, sel_unit->sprite, 'F', sel_unit);
+		      draw_tile(ht, sel_unit->x_pos, sel_unit->y_pos);
+		      current_unit->active = true;
+		      sel_pressed = true;
+		      sel_2_pressed = true;
+		      break;
+		    }
+		}
+	      break;
+	    }
+	}
+      current_player->food -= 100;
+      print_assets('F', current_player->food, 'P');
+      print_assets('U', current_player->num_units, 'P');
+      draw_unit(ht, current_unit->x_pos, current_unit->y_pos, current_unit->sprite, 'F');
+      print_unit_info();
+    }
+
+  if(select == LOW && sel_pressed == false)
     {
       if(current_unit->moving == false && current_unit->gathering == false)
 	{
@@ -459,14 +545,15 @@ void check_button_press(hashtable *ht)
 
 	  if((CursorX == current_player->gate_x && CursorY == current_player->gate_y && current_unit->resource_amount > 0) || 
 	     ((t->resource_type_1 != NULL || t->resource_type_2 != NULL) && 
-	      (t->resource_amount_1 > 0 || t->resource_amount_2 > 0) && current_unit->resource_amount < 200 &&
-	      (current_unit->resource_type == t->resource_type_1 || current_unit->resource_type == t->resource_type_2 || current_unit->resource_type == NULL)))
+	      (current_unit->resource_type == t->resource_type_1 && t->resource_amount_1 > 0 || 
+	       current_unit->resource_type == t->resource_type_2 && t->resource_amount_2 > 0) && current_unit->resource_amount < 200 || 
+	      current_unit->resource_type == NULL && (t->resource_amount_1 > 0 || t->resource_amount_2 > 0)))
 	    {
-	      if(t->resource_type_1 != NULL)
+	      if(t->resource_amount_1 > 0 && current_unit->resource_type == NULL)
 		{
 		  current_unit->resource_type = t->resource_type_1;
 		}
-	      else if(t->resource_type_2 != NULL)
+	      else if(t->resource_amount_2 > 0 && current_unit->resource_type == NULL)
 		{
 		  current_unit->resource_type = t->resource_type_2;
 		}
@@ -474,24 +561,59 @@ void check_button_press(hashtable *ht)
 	      current_unit->moving = true;
 	      current_unit->x_dest = CursorX;
 	      current_unit->y_dest = CursorY;
-	      current_unit->move_speed = (current_unit->resource_amount*5) + get_speed_info(ht, current_unit->x_pos, current_unit->y_pos);
+	      current_unit->move_speed = (current_unit->resource_amount*2) + get_speed_info(ht, current_unit->x_pos, current_unit->y_pos);
 	      current_unit->depart_time = millis();
+	      sel_pressed = true;
+	    }
+	}
+    }
+
+  if(select_2 == LOW && current_player->num_units > 1 && sel_2_pressed == false && millis() - last_pressed > 300)
+    {
+      for(int u = 0; u < 10; u++)
+	{
+	  unit *sel_unit = &current_player->units[u];
+	  if(sel_unit->active == true && sel_unit == current_unit)
+	    {
+	      for(int nu = 1; nu < 10; nu++)
+		{
+		  unit *next_sel_unit = &current_player->units[(u+nu)%10];
+		  if(next_sel_unit->active == true)
+		    {
+		      current_unit = next_sel_unit;
+		      //draw_unit(sel_unit->x_pos, sel_unit->y_pos, sel_unit->sprite, 'F', sel_unit);
+		      //draw_unit(current_unit->x_pos, current_unit->y_pos, current_unit->sprite, 'F', current_unit);
+		      draw_tile(ht, sel_unit->x_pos, sel_unit->y_pos);
+		      draw_tile(ht, current_unit->x_pos, current_unit->y_pos);
+		      print_unit_info();
+		      sel_2_pressed = true;
+		      last_pressed = millis();
+		      break;
+		    }
+		}
+	      break;
 	    }
 	}
     }
 }
 
-void draw_unit(int x_pos, int y_pos, byte sprite, char front_back)
+void draw_unit(hashtable *ht, int x_pos, int y_pos, byte sprite, char front_back, unit *sel_unit, char team[])
 {
   prog_uint16_t *Sprite;
   
   int new_x_pos = x_pos * tile_x_size + 4;
-  int new_y_pos = y_pos * tile_y_size;
+  int new_y_pos = y_pos * tile_y_size + 1;
 
   int sprite_width;
   int sprite_height = 28;
 
-  if(front_back == 'F')
+  tile *t = tile_lookup(ht, x_pos, y_pos);
+  if(t->type == 'H')
+    {
+      Sprite = Canoe;
+      sprite_width = 20;
+    }
+  else if(front_back == 'F')
     {
       sprite_width = 24;
 
@@ -527,15 +649,27 @@ void draw_unit(int x_pos, int y_pos, byte sprite, char front_back)
 	Sprite = Male_3_B;
     }
 
+  long shadow_color = VGA_WHITE;
+  if(sel_unit != current_unit)
+    {
+      if(!strcmp(team, "GREEN"))
+	shadow_color = VGA_LIME;
+      else if(!strcmp(team, "RED"))
+	shadow_color = VGA_RED;
+    }
+    
 
   if(x_pos < tile_width/2 && y_pos < tile_height/2)
-      myGLCD.drawBitmap(new_x_pos, new_y_pos, sprite_width, sprite_height, Sprite);
+    myGLCD.drawBitmap(new_x_pos, new_y_pos, sprite_width, sprite_height, Sprite, 1, long(0xF81F), shadow_color);
   else if(x_pos >= tile_width/2 && y_pos < tile_height/2)
-      myGLCD2.drawBitmap(new_x_pos - (tile_width/2)*tile_x_size, new_y_pos, sprite_width, sprite_height, Sprite);
+    myGLCD2.drawBitmap(new_x_pos - (tile_width/2)*tile_x_size, new_y_pos, sprite_width, sprite_height, Sprite, 1, long(0xF81F), shadow_color);
   else if(x_pos < tile_width/2 && y_pos >= tile_height/2)
-    myGLCD3.drawBitmap(new_x_pos, new_y_pos - (tile_height/2)*tile_y_size, sprite_width, sprite_height, Sprite);
+    myGLCD3.drawBitmap(new_x_pos, new_y_pos - (tile_height/2)*tile_y_size, sprite_width, sprite_height, Sprite, 1, long(0xF81F), shadow_color);
   else if(x_pos >= tile_width/2 && y_pos >= tile_height/2)
-      myGLCD4.drawBitmap(new_x_pos - (tile_width/2)*tile_x_size, new_y_pos - (tile_height/2)*tile_y_size, sprite_width, sprite_height, Sprite);
+    myGLCD4.drawBitmap(new_x_pos - (tile_width/2)*tile_x_size, new_y_pos - (tile_height/2)*tile_y_size, sprite_width, sprite_height, Sprite, 1, long(0xF81F), shadow_color);
+  
+  if(x_pos == CursorX && y_pos == CursorY)
+    draw_cursor(x_pos, y_pos);
 }
 
 void move_units(hashtable *ht, player *sel_player)
@@ -549,36 +683,28 @@ void move_units(hashtable *ht, player *sel_player)
 	    {
 	      if(millis() - sel_unit->depart_time > sel_unit->move_speed)
 		{
-		  draw_tile(ht, sel_unit->x_pos, sel_unit->y_pos);
-
-		  if(abs(sel_unit->x_dest - sel_unit->x_pos) > abs(sel_unit->y_dest - sel_unit->y_pos))
-		    sel_unit->x_pos += signof(sel_unit->x_dest - sel_unit->x_pos);
-		  else
+		  int prev_x_pos = sel_unit->x_pos;
+		  int prev_y_pos = sel_unit->y_pos;
+		  if(!(sel_unit->y_pos == 12 && (sel_unit->x_pos < 2 || sel_unit->x_pos > 17) && signof(sel_unit->y_dest - sel_unit->y_pos) == 1))
 		    sel_unit->y_pos += signof(sel_unit->y_dest - sel_unit->y_pos);
+		  
+		  if(!(sel_unit->y_pos > 13 && ((sel_unit->x_pos == 4 && signof(sel_unit->x_dest - sel_unit->x_pos) == -1) ||
+						(sel_unit->x_pos == 15 && signof(sel_unit->x_dest - sel_unit->x_pos) == 1))))
+		    sel_unit->x_pos += signof(sel_unit->x_dest - sel_unit->x_pos);
 
-		  draw_unit(sel_unit->x_pos, sel_unit->y_pos, sel_unit->sprite, 'F');
+		  draw_tile(ht, prev_x_pos, prev_y_pos);
+		  draw_unit(ht, sel_unit->x_pos, sel_unit->y_pos, sel_unit->sprite, 'F', sel_unit);
 
-		  sel_unit->move_speed = (sel_unit->resource_amount*5) + get_speed_info(ht, sel_unit->x_pos, sel_unit->y_pos);
+		  sel_unit->move_speed = (sel_unit->resource_amount*2) + get_speed_info(ht, sel_unit->x_pos, sel_unit->y_pos);
 		  sel_unit->depart_time = millis();
 		}
 	    }
 	  else
 	    {
-	      if(sel_unit->x_pos == green.gate_x && sel_unit->y_pos == green.gate_y)
-		{
-		  Serial.println(sel_unit->x_pos);
-		  Serial.println(sel_unit->y_pos);
-		  Serial.println(sel_unit->x_dest);
-		  Serial.println(sel_unit->y_dest);
-		  Serial.println(sel_unit->gathering);
-		  Serial.println(sel_unit->moving);
-		  Serial.println(sel_unit->active);
-		}
 	      sel_unit->moving = false;
 	      sel_unit->gathering = true;
 	      sel_unit->gather_time = millis();
-	      draw_unit(sel_unit->x_pos, sel_unit->y_pos, sel_unit->sprite, 'B');
-	      Serial.println("YUP");
+	      draw_tile(ht, sel_unit->x_pos, sel_unit->y_pos);
 	    }
 	}
     }
@@ -589,13 +715,12 @@ void transfer_resources(hashtable *ht, player *sel_player)
   for(int u = 0; u < 10; u++)
     {
       unit *sel_unit = &sel_player->units[u];
+
       if(sel_unit->active == true && sel_unit->gathering == true && 
-	 sel_unit->x_dest == sel_player->gate_x && sel_unit->y_dest == sel_player->gate_y)
+	 sel_unit->x_pos == sel_player->gate_x && sel_unit->y_pos == sel_player->gate_y)
 	{
-	  Serial.println("First!");
 	  if(sel_unit->resource_amount > 0)
 	    {
-	      Serial.println("2nd!");
 	      if(millis() - sel_unit->gather_time > tile_gather_time)
 		{
 		  byte resource_move = 5;
@@ -603,16 +728,35 @@ void transfer_resources(hashtable *ht, player *sel_player)
 		  if(sel_unit->resource_amount - resource_move < 0)
 		    resource_move = sel_unit->resource_amount;
 		      
-		  Serial.println("Tansfering yo!");
-		  update_assets(sel_unit->resource_type, resource_move, 'P', sel_player);
-		  
+		  if(sel_unit->resource_type == 'G')
+		    {
+		      sel_player->gold += resource_move;
+		      print_assets('G', sel_player->gold, 'P', sel_player);
+		    }
+		  if(sel_unit->resource_type == 'W')
+		    {
+		      sel_player->wood += resource_move;
+		      print_assets('W', sel_player->wood, 'P', sel_player);
+		    }
+		  if(sel_unit->resource_type == 'F')
+		    {
+		      sel_player->food += resource_move;
+		      print_assets('F', sel_player->food, 'P', sel_player);
+		    }
+
+
 		  update_unit_resources(sel_unit->resource_type, (resource_move * -1), sel_unit, sel_player);
+		  sel_unit->gather_time = millis();
 		}
 	    }
 	  else
 	    {
 	      sel_unit->gathering = false;
-	      draw_unit(sel_unit->x_pos, sel_unit->y_pos, sel_unit->sprite, 'F');
+	      sel_unit->resource_type = NULL;
+	      update_unit_resources(sel_unit->resource_type, 0, sel_unit, sel_player);
+	      draw_tile(ht, sel_unit->x_pos, sel_unit->y_pos);
+	      //draw_unit(sel_unit->x_pos, sel_unit->y_pos, sel_unit->sprite, 'F', sel_unit);
+	      change_turns(ht);
 	    }
 	}
     }
@@ -623,21 +767,24 @@ void gather_resources(hashtable *ht, player *sel_player)
   for(int u = 0; u < 10; u++)
     {
       unit *sel_unit = &sel_player->units[u];
-      if(sel_unit->active == true && sel_unit->gathering == true)
+      if(sel_unit->active == true && sel_unit->gathering == true && (sel_unit->x_dest != sel_player->gate_x || sel_unit->y_dest != sel_player->gate_y))
 	{
 	  tile *t = tile_lookup(ht, sel_unit->x_pos, sel_unit->y_pos);
-	    
 	  if(((sel_unit->resource_type == t->resource_type_1 && t->resource_amount_1 > 0) || 
 	      (sel_unit->resource_type == t->resource_type_2 && t->resource_amount_2 > 0)) &&
-	     (sel_unit->x_dest != sel_player->gate_x || sel_unit->y_dest != sel_player->gate_y))
+	     sel_unit->resource_amount < 200)
 	    {
 	      if(millis() - sel_unit->gather_time > tile_gather_time)
 		{
 		  byte resource_gain = 5;
+
+
 		  if(sel_unit->resource_type == t->resource_type_1)
 		    {
 		      if(t->resource_amount_1 - resource_gain < 0)
 			resource_gain = t->resource_amount_1;
+		      if(sel_unit->resource_amount + resource_gain > 200)
+			resource_gain = 200 - sel_unit->resource_amount;
 		      
 		      t->resource_amount_1 -= resource_gain;
 		    }
@@ -645,30 +792,25 @@ void gather_resources(hashtable *ht, player *sel_player)
 		    {
 		      if(t->resource_amount_2 - resource_gain < 0)
 			resource_gain = t->resource_amount_2;
+		      if(sel_unit->resource_amount + resource_gain > 200)
+			resource_gain = 200 - sel_unit->resource_amount;
 		      
 		      t->resource_amount_2 -= resource_gain;
 		    }
+
 		  if(sel_unit->x_pos == CursorX && sel_unit->y_pos == CursorY)
 		    update_cursor_assets(t->resource_type_1, t->resource_amount_1, t->resource_type_2, t->resource_amount_2);
 		  
 		  update_unit_resources(sel_unit->resource_type, resource_gain, sel_unit, sel_player);
+
+		  sel_unit->gather_time = millis();
 		}
 	    }
 	  else
 	    {
 	      sel_unit->gathering = false;
-	      draw_unit(sel_unit->x_pos, sel_unit->y_pos, sel_unit->sprite, 'F');
-
-	      if(sel_unit->resource_type == t->resource_type_1)
-		{
-		  t->resource_type_1 = NULL;
-		  t->resource_amount_1 = 0;
-		}
-	      else if(sel_unit->resource_type == t->resource_type_2)
-		{
-		  t->resource_type_2 = NULL;
-		  t->resource_amount_2 = 0;
-		}
+	      draw_tile(ht, sel_unit->x_pos, sel_unit->y_pos);
+	      //draw_unit(sel_unit->x_pos, sel_unit->y_pos, sel_unit->sprite, 'F', sel_unit);
 	    }
 	}
     }
@@ -750,4 +892,66 @@ void draw_base_corner(char team)
     myGLCD3.drawBitmap(green.gate_x * tile_x_size, (green.gate_y * tile_y_size)%ScrYsize, 32, 30, Green_Corner);
   else if(team == 'R')
     myGLCD4.drawBitmap((red.gate_x * tile_x_size)%ScrXsize, (red.gate_y * tile_y_size)%ScrYsize, 32, 30, Red_Corner);
+}
+
+void change_turns(hashtable *ht, player *sel_player)
+{
+  /*Serial.read(); // Gets rid of any stuff in the inbox
+
+  int a[] = { sel_player->gold, sel_player->wood, sel_player->food };
+
+  for(int i = 0; i < 3; i++)
+    {
+      Serial.print(a[i]);
+      Serial.print(" ");
+    }
+    Serial.print('\n');*/
+
+  sel_player->gold = 0;
+  sel_player->wood = 0;
+  sel_player->food = 0;
+
+  char team[10];
+  print_assets('R', 0, 'P', sel_player);
+
+  if(!strcmp(sel_player->team, "GREEN"))
+    {
+      strcpy(team, "GREEN");
+      current_player = &red;
+      current_VERT = VERT;
+      current_HORIZ = HORIZ;
+      current_SEL = SEL;
+      current_SEL_2 = SEL_2;
+      current_JoyCenterX = JoyCenterX;
+      current_JoyCenterY = JoyCenterY;
+    }
+  else if(!strcmp(sel_player->team, "RED"))
+    {
+      strcpy(team, "RED");
+      current_player = &green;
+      current_VERT = VERT_2;
+      current_HORIZ = HORIZ_2;
+      current_SEL = SEL_3;
+      current_SEL_2 = SEL_4;
+      current_JoyCenterX = JoyCenterX_2;
+      current_JoyCenterY = JoyCenterY_2;
+    }
+
+  unit *temp_unit = current_unit;
+  for(int u = 0; u < 10; u++)
+    {
+      unit *sel_unit = &current_player->units[u];
+      if(sel_unit->active == true)
+	{
+	  current_unit = sel_unit;
+	  draw_tile(ht, current_unit->x_pos, current_unit->y_pos);
+
+	  if(temp_unit->gathering == true)
+	    draw_unit(ht, temp_unit->x_pos, temp_unit->y_pos, temp_unit->sprite, 'B', temp_unit, team);
+	  else
+	    draw_unit(ht, temp_unit->x_pos, temp_unit->y_pos, temp_unit->sprite, 'F', temp_unit, team);
+	  //draw_tile(ht, temp_unit->x_pos, temp_unit->y_pos);
+	  break;
+	}
+    }
 }

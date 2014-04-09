@@ -22,11 +22,11 @@ void fill_tiles(hashtable *ht, tile tile_list[], byte tiles_x, byte tile_y)
       byte resource_2_spawn = int(random(6)/5); // 1/6 chance of spawning a secondary resource
 	  
       if(cont_region == 1)
-	cont_multiplier = random(5); // Between 0 and 20
+	cont_multiplier = random(10);
       else if(cont_region == 2)
-	cont_multiplier = random(4, 19); // Between 20 and 90
+	cont_multiplier = random(8, 19);
       else if(cont_region == 3)
-	cont_multiplier = random(12, 31); // Between 60 and 150
+	cont_multiplier = random(14, 31);
 
       // No resources for tile types Beach, Wall, and None
       if(t.type == 'G') // Grass
@@ -38,23 +38,18 @@ void fill_tiles(hashtable *ht, tile tile_list[], byte tiles_x, byte tile_y)
 	{
 	  t.resource_amount_1 = cont_multiplier*random(3, 6);
 	  t.resource_type_1 = 'W';
-
+	  t.resource_type_2 = 'F';
 	  if(resource_2_spawn)
-	    {
 	      t.resource_amount_2 = cont_multiplier*random(1, 3);
-	      t.resource_type_2 = 'F';
-	    }
 	}
       else if(t.type == 'M')
 	{
 	  t.resource_amount_1 = cont_multiplier*random(3, 6);
 	  t.resource_type_1 = 'G';
+	  t.resource_type_2 = 'W';
 
 	  if(resource_2_spawn)
-	    {
 	      t.resource_amount_2 = cont_multiplier*random(1, 3);
-	      t.resource_type_2 = 'W';
-	    }
 	}
       else if(t.type == 'R')
 	{
@@ -68,12 +63,10 @@ void fill_tiles(hashtable *ht, tile tile_list[], byte tiles_x, byte tile_y)
 	{
 	  t.resource_amount_1 = cont_multiplier*random(2, 4);
 	  t.resource_type_1 = 'F';
+	  t.resource_type_2 = 'G';
 
 	  if(resource_2_spawn)
-	    {
 	      t.resource_amount_2 = cont_multiplier*random(1, 3);
-	      t.resource_type_2 = 'G';
-	    }
 	}
 
       int index = t.y_pos;
@@ -89,12 +82,13 @@ tile *tile_lookup(hashtable *ht, byte x_pos, byte y_pos)
 {    
   ht_node *node = ht->buckets[y_pos];
 
-  while(node){
-    if(node->t.x_pos == x_pos && node->t.y_pos == y_pos)
-      return &node->t;
+  while(node)
+    {
+      if(node->t.x_pos == x_pos && node->t.y_pos == y_pos)
+	return &node->t;
 
-    node = node->next;
-  }
+      node = node->next;
+    }
 
   return NULL;
 }
@@ -104,11 +98,11 @@ int get_speed_info(hashtable *ht, byte x_pos, byte y_pos)
   tile *t = tile_lookup(ht, x_pos, y_pos);
   char tile_type = t->type;
   if(tile_type == 'B' || tile_type == 'G' || tile_type == 'R')
-    return(250);
+    return(80);
   else if(tile_type == 'H' || tile_type == 'F')
-    return(500);
+    return(220);
   else if(tile_type == 'M' )
-    return(750);
+    return(340);
 }
 
 unsigned long color565(unsigned long redNumber, long greenNumber, long blueNumber)

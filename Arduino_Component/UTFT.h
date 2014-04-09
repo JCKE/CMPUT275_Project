@@ -207,7 +207,7 @@ class UTFT
 		uint8_t* getFont();
 		uint8_t	getFontXsize();
 		uint8_t	getFontYsize();
-		void	drawBitmap(int x, int y, int sx, int sy, bitmapdatatype data, int scale=1);
+		void	drawBitmap(int x, int y, int sx, int sy, bitmapdatatype data, int scale=1, long trans_color = -2, long shadow_color = -2);
 		void	drawBitmap(int x, int y, int sx, int sy, bitmapdatatype data, int deg, int rox, int roy);
 		void	lcdOff();
 		void	lcdOn();
