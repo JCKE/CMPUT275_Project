@@ -1,4 +1,4 @@
-import sys, pygame
+import sys, pygame, serial
 import random
 
 from pygame.sprite import LayeredUpdates
@@ -386,7 +386,7 @@ class GUI(LayeredUpdates):
         else:
             raise Exception("Where is your team?")
 
-    def update_resources(self, unit_name):
+    def renew_resources(self, unit_name):
         """
         Updates resources if unit is deleted.
         Gives back half of original price.
@@ -623,6 +623,8 @@ class GUI(LayeredUpdates):
         
         # advance turn
         self.current_turn += 1
+        
+        #Send end turn code
 
     def build_pressed(self):
         """
@@ -793,22 +795,24 @@ class GUI(LayeredUpdates):
                                       screen_rect.h)
         self.bg_color = bg_color
         self.map = None
+        self.newturn = 0
 
         # Set up team information
         self.num_teams = 2
         self.current_turn = 0
         self.win_team = None 
-        self.gteam_gold = 1001
-        self.gteam_wood = 1002
-        self.gteam_food = 1003
-        self.rteam_gold = 1004
-        self.rteam_wood = 1005
-        self.rteam_food = 1006
+        self.gteam_gold = 5
+        self.gteam_wood = 10
+        self.gteam_food = 5
+        self.rteam_gold = 5
+        self.rteam_wood = 10
+        self.rteam_food = 5
 
         # The currently selected unit
         self.sel_unit = None
         self.check_base = 0
         self.current_button = None
+
         # Set up GUI
         self.buttons = [
             Button(0, "MOVE", self.move_pressed, self.can_move, None),
@@ -1005,6 +1009,7 @@ class GUI(LayeredUpdates):
                 unit_tile = self.map.tile_data(unit_pos)[0]
                 u.begin_round(unit_tile)
 
+        # Change to next mode
         self.change_mode(Modes.Select)
 
     def which_button(self, button):
@@ -1182,7 +1187,7 @@ class GUI(LayeredUpdates):
                 if (self.sel_unit.type != "StartFlag" and
                     self.sel_unit.type != "Factory"):
                     self.sel_unit.deactivate()
-                    self.update_resources(self.sel_unit.type)
+                    self.renew_resources(self.sel_unit.type)
                     self.change_mode(Modes.Select)
                     self.sel_unit = None
             
@@ -1303,6 +1308,8 @@ class GUI(LayeredUpdates):
         base_unit.BaseUnit.active_units.update()
         
         if self.mode == Modes.Begin:
+            # signal coordination and begin new turn
+            self.newturn = 1
             self.begin_turn()
             
         # The unit is finished moving, so go back to select
@@ -1839,3 +1846,31 @@ class GUI(LayeredUpdates):
                             y,
                             self.units_bar_rect.width,
                             UNIT_BUTTON_HEIGHT)
+    def signal(self):
+        """
+        Used for coordinating with arduino
+        """
+        self.newturn = 0
+
+    def update_resources(self, serial_in):
+        """
+        Recieves resource info from arduino
+        """
+        raw_data = serial_in.readline()
+        
+        try:
+            data = raw_data.decode('ascii')
+        except (AttributeError, TypeError, UnicodeDecodeError):
+            print("client: ascii decoding problem")
+            data = raw_data
+
+        data = data.split()
+
+        if self.cur_team == 0:
+            self.gteam_gold += int(data[0])
+            self.gteam_wood += int(data[1])
+            self.gteam_food += int(data[2])
+        elif self.cur_team == 1:
+            self.rteam_gold += int(data[0])
+            self.rteam_wood += int(data[1])
+            self.rteam_food += int(data[2])

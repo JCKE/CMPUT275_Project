@@ -39,7 +39,6 @@ class AntiAir(GroundUnit):
         self.bonus_damage = 7
         self.defense = 2
         self.hit_effect = effects.Ricochet
-        self.price = 20
         self._move_costs = {'plains': 1.5,
                              'sand': 1.5,
                              'road': 1,
@@ -82,6 +81,6 @@ class AntiAir(GroundUnit):
             return damage - defense
         else: return super().get_damage(target, target_tile)
 
-    def price(): return (50, 50, 75)
+    def price(): return (10, 30, 10)
 
 unit.unit_types["Anti-Air"] = AntiAir

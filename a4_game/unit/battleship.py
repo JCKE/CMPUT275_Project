@@ -36,8 +36,8 @@ class Battleship(WaterUnit):
         self.damage = 6
         self.defense = 3
         self.hit_effect = effects.Explosion
-        self.price = 20
+
         
-    def price(): return (75, 80, 85)
+    def price(): return (40, 400, 40)
 
 unit.unit_types["Battleship"] = Battleship

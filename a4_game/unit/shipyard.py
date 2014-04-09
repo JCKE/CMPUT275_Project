@@ -31,7 +31,7 @@ class Shipyard(ConstructionUnit):
         self.damage = 0
         self.defense = 2
         self.hit_effect = effects.Explosion
-        self.health = 30
+
         
     def is_buildable(self, tile, pos):
         """
@@ -48,6 +48,6 @@ class Shipyard(ConstructionUnit):
         # Can't build on anything else
             return False
 
-    def price(): return (200, 200, 200)
+    def price(): return (75, 75, 75)
 
 unit.unit_types["Shipyard"] = Shipyard

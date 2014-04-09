@@ -8,7 +8,7 @@ class Carrier(WaterUnit):
     An aircraft carrier. Not designed for battle; instead, it provides a spot
     for up to 4 aircraft to dock.
     
-    Armour: Medium
+    Armour: High
     Speed: Low
     Range: Low
     Damage: Low
@@ -34,8 +34,8 @@ class Carrier(WaterUnit):
         self.speed = 4
         self.max_atk_range = 2
         self.damage = 4
-        self.defense = 2
+        self.defense = 4
         self.hit_effect = effects.Ricochet
 
-    def price(): return (50, 80, 80)
+    def price(): return (40, 50, 50)
 unit.unit_types["Carrier"] = Carrier

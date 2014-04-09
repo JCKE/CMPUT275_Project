@@ -12,6 +12,9 @@ class ImmobileUnit(BaseUnit):
       any tile and is therefore unable to move.
     - Not allowed to place units beyond certain radius
       of "base" unit.
+
+      Meant to be developed into turrets and base defenses if time 
+      allows.
     """
     def __init__(self, **keywords):
         #load the base class
