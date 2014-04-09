@@ -45,6 +45,6 @@ class Jeep(GroundUnit):
                              'road': 1,
                              'mountain': 4}
 
-    def price(): return (5, 10, 5)
+    def price(): return (2, 10, 5)
 
 unit.unit_types["Jeep"] = Jeep
