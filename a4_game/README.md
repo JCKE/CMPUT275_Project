@@ -50,7 +50,7 @@ click either mouse button on your selected unit.
 
 Each turn, you may move each of your units once and attack with each of your 
 units once. You can also choose to build units and bases at the cost of 
-resources during your turn. Pressing the d button will allow you to
+resources during your turn. Pressing the **d** button will allow you to
 sell a unit and recieve half of the original price. 
 When you are done, press the **END TURN** button or press enter/return
 to let the other team take its turn. In some cases, such as with air units, the unit 
