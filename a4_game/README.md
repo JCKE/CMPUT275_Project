@@ -136,6 +136,7 @@ The bases are:
 - Factory: main base where you can build ground units and other bases from it. No cost.
 - Airstrip: allows you to build and refuel air units. Not free to build.
 - Shipyard: allows you to build water units. Not free to build. Must be built on a sand tile.
+- Unit buttons: The rest of the buttons are for building the various units
 
 Sound Credits
 -------------
