@@ -13,10 +13,16 @@ BG_COLOR = (32, 32, 32)
 # Working from stdin/stdout not recommended
 
 def main():
+    """
+    Main function. Acts as a front end, calls
+    initializations and takes input and directs it
+    to where it needs to be, same with output.
+    Used parser from assignment.
+    """
 
     args = parse_args()
 
-    # Initialize everything
+    # Initialize
     pygame.mixer.pre_init(22050, -16, 2, 512) # Small buffer for less sound lag
     pygame.init()
     pygame.display.set_caption("Tactics 2")
@@ -35,7 +41,7 @@ def main():
     if args.map:
         level = args.map
         main_gui.load_level("maps/" + level + ".lvl")
-
+    # In case of debuging
     if args.verbose:
         debug = True
         print("Debugging turned on")

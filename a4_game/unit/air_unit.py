@@ -24,8 +24,8 @@ class AirUnit(BaseUnit):
     """
     The basic air-moving unit.
     
-    - Must move a minimum distance every turn unless docked at a carrier
-    - Gradually runs out of fuel unless docked at a carrier
+    - Must move a minimum distance every turn unless docked at a carrier or airstrip
+    - Gradually runs out of fuel unless docked at a carrier or airstrip
     - When fuel reaches 0, the unit will die
     - Only collides with other air units
     - Does not get tile bonuses
@@ -90,17 +90,17 @@ class AirUnit(BaseUnit):
     
     def is_docked(self, pos):
         """
-        Checks if the given position is currently adjacent to a carrier of the
-        same team.
+        Checks if the given position is currently adjacent to a carrier
+        or airstrip of the same team.
         """
         for u in BaseUnit.active_units:
             if (u.team == self.team and
                 (isinstance(u, Carrier) or isinstance(u, Airstrip)) and
                 helper.manhattan_dist((u.tile_x, u.tile_y), pos) <= 1):
-                # This is an adjacent carrier! Rejoice!
+                # This is an adjacent carrier or airstrip! Rejoice!
                 return True
         
-        # No carriers
+        # No carriers or airstrips
         return False
         
     def activate(self):

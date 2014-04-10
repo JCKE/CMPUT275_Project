@@ -8,6 +8,9 @@ class StartFlag(ConstructionUnit):
     A start flag. Used to give player
     some options in choosing where to
     place their starting base.
+    
+    - Only exists in the first turn and can't
+      do anything beyond building a factory
     """
     sprite = pygame.image.load("assets/startflag.png")
     
@@ -27,7 +30,6 @@ class StartFlag(ConstructionUnit):
         self.damage = 0
         self.defense = 3
         self.health = 30
-
 
                                      
     def can_hit(self, target_unit):

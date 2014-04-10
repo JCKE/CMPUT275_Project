@@ -37,5 +37,5 @@ class Carrier(WaterUnit):
         self.defense = 4
         self.hit_effect = effects.Ricochet
 
-    def price(): return (40, 50, 50)
+    def price(): return (15, 30, 30)
 unit.unit_types["Carrier"] = Carrier

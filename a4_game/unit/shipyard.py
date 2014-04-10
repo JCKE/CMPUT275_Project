@@ -7,10 +7,9 @@ class Shipyard(ConstructionUnit):
     """
     A shipyard. High health, this is the life blood of your navy.
     It allows you to create water units.
-    
-    Other notes:
-    - Can make air and ground defenses to protect itself but
-      only within a certain radius.
+
+    - Can only be built on sand tiles and build units on water
+      tiles
     """
     sprite = pygame.image.load("assets/shipyard.png")
     

@@ -18,7 +18,7 @@ class Bomber(AirUnit):
     Other notes:
     - The bomber has a medium amount of fuel. Players must still make
       well-planned bombing runs to ensure they can get back to the
-      carrier in time.
+      carrier or airstrip in time.
     - When firing at ground and water units this unit does more damage.
     - Can't hit air units.
     """

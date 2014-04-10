@@ -17,7 +17,7 @@ class Fighter(AirUnit):
     Other notes:
     - In order to maintain its high speed, the fighter has fairly low fuel.
       Make well-planned strafing runs and be sure you can get back to a carrier
-      in time!
+      or airstrip in time!
     - When firing at another air unit, this unit does extra damage.
     """
     sprite = pygame.image.load("assets/fighter.png")

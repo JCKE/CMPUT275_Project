@@ -6,11 +6,7 @@ import pygame
 class Factory(ConstructionUnit):
     """
     A factory. High health, this is the life blood of your army.
-    It allows you to create units.
-    
-    Other notes:
-    - Can make air and ground defenses to protect itself but
-      only within a certain radius.
+    It allows you to create ground units and other bases.    
     """
     sprite = pygame.image.load("assets/factory.png")
     

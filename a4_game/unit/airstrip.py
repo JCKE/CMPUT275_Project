@@ -8,10 +8,8 @@ class Airstrip(ConstructionUnit):
     An airstrip. High health, this is the life blood of your airforce.
     It allows you to create air units.
 
-    
-    Other notes:
-    - Can make air and ground defenses to protect itself but
-      only within a certain radius.
+    Has speed but can't attack or go anywhere, speed is
+    used for determining build radius.
     """
     sprite = pygame.image.load("assets/airstrip.png")
     
