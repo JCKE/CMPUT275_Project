@@ -6,7 +6,7 @@
 typedef struct {
   byte x_pos;
   byte y_pos;
-  char type; // B, G, F, M, R, W, H
+  char type; // B each, G rass, F orest, M ountain, R oad, W all, H 20 (Water)
   byte resource_amount_1;
   char resource_type_1; // W ood, G old, F ood
   byte resource_amount_2;
@@ -26,6 +26,6 @@ hashtable *ht_new(byte tiles_y);
 void fill_tiles(hashtable *ht, tile tile_list[], byte tiles_x, byte tiles_y);
 tile *tile_lookup(hashtable *ht, byte x_pos, byte y_pos);
 int get_speed_info(hashtable *ht, byte x_pos, byte y_pos);
-unsigned long color565(unsigned long redNumber, long greenNumber, long blueNumber);
+unsigned long color565(byte redNumber, byte greenNumber, byte blueNumber);
 
 #endif
